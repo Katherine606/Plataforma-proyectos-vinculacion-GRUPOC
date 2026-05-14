@@ -121,7 +121,7 @@ C:\xampp\php\php.exe -S localhost:8000
 
 Si la ejecución es correcta aparecerá: PHP Development Server started
 
-# 7. Verificación del Backend
+# 6. Verificación del Backend
 
 Abrir en el navegador:
 
@@ -129,7 +129,7 @@ http://localhost:8000/index.php?recurso=proyectos
 
 Si el backend funciona correctamente se mostrará información JSON correspondiente a los proyectos registrados.
 
-# 8. Base de Datos
+# 7. Base de Datos
 
 Actualmente el proyecto se encuentra en fase de diseño y estructuración de base de datos.
 
