@@ -1,5 +1,6 @@
 import { Component, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { HttpErrorResponse } from '@angular/common/http';
 import { RouterLink, Router } from '@angular/router';
 import {
   FormBuilder, FormGroup, Validators, ReactiveFormsModule, AbstractControl, ValidationErrors
@@ -18,6 +19,7 @@ export class FormularioProyectoComponent {
   form: FormGroup;
   enviando = false;
   errorEnvio = '';
+  tutoresDisponibles = ['Ing. Juan Pérez', 'Ing. María López'];
 
   constructor(
     private fb: FormBuilder,
@@ -83,6 +85,11 @@ export class FormularioProyectoComponent {
     this.form.markAllAsTouched();
     if (this.form.invalid) return;
 
+    if (!this.tutoresDisponibles.includes(this.form.value.tutor ?? '')) {
+      this.errorEnvio = 'Selecciona un tutor válido.';
+      return;
+    }
+
     this.enviando = true;
     this.errorEnvio = '';
     this.cdr.detectChanges();
@@ -92,9 +99,11 @@ export class FormularioProyectoComponent {
         // Navegar al editor después de guardar
         this.router.navigate(['/editor']);
       },
-      error: (err) => {
+      error: (err: HttpErrorResponse) => {
         console.error('Error al crear proyecto:', err);
-        this.errorEnvio = 'No se pudo guardar. Verifica que el servidor PHP esté corriendo.';
+        this.errorEnvio = err.status === 403
+          ? 'Acceso denegado: tu rol no puede crear proyectos.'
+          : 'No se pudo guardar. Verifica que el servidor PHP esté corriendo.';
         this.enviando = false;
         this.cdr.detectChanges();
       }

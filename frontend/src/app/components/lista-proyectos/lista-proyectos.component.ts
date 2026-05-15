@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { ProyectoService } from '../../services/proyecto.service';
 import { Proyecto } from '../../models/proyecto.model';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-lista-proyectos',
@@ -16,13 +17,19 @@ export class ListaProyectosComponent implements OnInit {
   proyectos: Proyecto[] = [];
   cargando = true;
   error = '';
+  rol = '';
+  canManageProjects = false;
 
   constructor(
     private proyectoService: ProyectoService,
+    private authService: AuthService,
     private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
+    this.rol = this.authService.getRole() ?? '';
+    this.canManageProjects = this.rol === 'Coordinador';
+
     this.proyectoService.getProyectos().subscribe({
       next: (data) => {
         this.proyectos = data;

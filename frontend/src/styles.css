@@ -33,8 +33,39 @@ body {
 
 .sidebar h2 {
   color: white;
-  margin-bottom: 30px;
+  margin-bottom: 6px;
   font-size: 22px;
+  width: 100%;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  line-height: 1.15;
+}
+
+.sidebar p {
+  color: #cbd5e1;
+  margin-bottom: 24px;
+  font-size: 14px;
+}
+
+.role-card {
+  background: linear-gradient(180deg, #24364a 0%, #1b2735 100%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 14px;
+  margin-bottom: 18px;
+  display: grid;
+  gap: 6px;
+}
+
+.role-card strong {
+  color: #ffffff;
+  font-size: 14px;
+}
+
+.role-card span {
+  color: #cbd5e1;
+  font-size: 12px;
+  line-height: 1.4;
 }
 
 .menu {
@@ -61,8 +92,10 @@ body {
   margin-top: auto;
 }
 
-.back-button a {
+.back-button a,
+.back-button button {
   display: block;
+  width: 100%;
   background-color: #dc2626;
   color: white;
   text-decoration: none;
@@ -71,9 +104,12 @@ body {
   text-align: center;
   transition: 0.3s;
   cursor: pointer;
+  border: none;
+  font-size: 14px;
 }
 
-.back-button a:hover {
+.back-button a:hover,
+.back-button button:hover {
   background-color: #b91c1c;
 }
 
@@ -229,24 +265,31 @@ table th {
 }
 
 .proyectos-grid {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 20px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 210px));
+  gap: 16px;
+  justify-content: start;
+  align-items: start;
 }
 
 .proyecto-card {
   background-color: #b87070;
   border-radius: 10px;
-  padding: 15px;
-  width: 220px;
+  padding: 14px;
+  width: 100%;
+  max-width: 210px;
+  min-height: 152px;
   color: white;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
 .card-top {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  margin-bottom: 10px;
+  gap: 10px;
 }
 
 .btn-eliminar {
@@ -260,11 +303,11 @@ table th {
 .btn-editar {
   display: block;
   width: 100%;
-  margin-bottom: 10px;
+  margin-top: auto;
   background-color: #7a4a4a;
   color: white;
   border: none;
-  padding: 8px;
+  padding: 7px 8px;
   border-radius: 6px;
   cursor: pointer;
 }
@@ -276,6 +319,7 @@ table th {
 .tutor-info {
   font-size: 12px;
   color: #f0d0d0;
+  line-height: 1.4;
 }
 
 /* ─── MODAL ──────────────────────────────────────────────────────────────── */

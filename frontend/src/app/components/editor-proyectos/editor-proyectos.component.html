@@ -12,6 +12,10 @@
   </div>
 </div>
 
+<div *ngIf="errorMsg" style="color:#dc2626; background:#fee; padding:12px; border-radius:8px; margin-bottom:15px;">
+  {{ errorMsg }}
+</div>
+
 <div class="proyectos-grid">
 
   <p *ngIf="proyectosFiltrados.length === 0" style="color:#888;">
@@ -21,11 +25,12 @@
   <div class="proyecto-card" *ngFor="let p of proyectosFiltrados">
     <div class="card-top">
       <strong>{{ p.nombre }}</strong>
-      <button class="btn-eliminar" title="Eliminar" (click)="confirmarEliminar(p)">
+      <button *ngIf="canManageProjects" class="btn-eliminar" title="Eliminar" (click)="confirmarEliminar(p)">
         🗑
       </button>
     </div>
-    <button class="btn btn-editar" (click)="abrirEditor(p)">Editar</button>
+    <button *ngIf="canManageProjects" class="btn btn-editar" (click)="abrirEditor(p)">Editar</button>
+    <span *ngIf="!canManageProjects" class="tutor-info">Solo lectura</span>
     <p class="tutor-info">tutor asignado: {{ p.tutor }}</p>
   </div>
 

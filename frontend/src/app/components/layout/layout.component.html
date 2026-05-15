@@ -3,23 +3,32 @@
   <!-- SIDEBAR -->
   <aside class="sidebar">
 
-    <h2>Hola, Jean Paul</h2>
+    <h2>{{ email }}</h2>
+    <p>Rol: {{ rol }}</p>
+
+    <div class="role-card">
+      <strong>{{ roleTitle }}</strong>
+      <span>{{ roleDescription }}</span>
+    </div>
 
     <nav class="menu">
       <!-- routerLinkActive marca el botón activo automáticamente -->
       <a routerLink="/"            routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
         Lista de proyectos
       </a>
-      <a routerLink="/editor"      routerLinkActive="active">
+      <a *ngIf="canManageProjects" routerLink="/nuevo" routerLinkActive="active">
+        Nuevo proyecto
+      </a>
+      <a *ngIf="canManageProjects" routerLink="/editor" routerLinkActive="active">
         Editor de proyectos
       </a>
-      <a routerLink="/solicitudes" routerLinkActive="active">
+      <a *ngIf="canManageStudents" routerLink="/solicitudes" routerLinkActive="active">
         Solicitudes
       </a>
     </nav>
 
     <div class="back-button">
-      <a href="#">← Regresar</a>
+      <button type="button" (click)="logout()">Cerrar sesión</button>
     </div>
 
   </aside>

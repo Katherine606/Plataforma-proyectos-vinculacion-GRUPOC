@@ -1,0 +1,23 @@
+[
+    {
+        "id": 1,
+        "correo": "coordinador@ug.edu.ec",
+        "password": "$2y$10$f5YO2oaYWWATisJ3LnDymeVqqR6a5djA1ISx9mcGJkAGam1W92oAy",
+        "rol_id": 1,
+        "rol": "Coordinador"
+    },
+    {
+        "id": 2,
+        "correo": "tutor@ug.edu.ec",
+        "password": "$2y$10$NdEC\/hWruJD24GXu81xfEOoqcZu0ei\/72BtiUdr.O8etGikfAm7R6",
+        "rol_id": 2,
+        "rol": "Tutor"
+    },
+    {
+        "id": 3,
+        "correo": "estudiante@ug.edu.ec",
+        "password": "$2y$10$IYnCtUaTa.gKLOjyKOZpOur6QXo875FyBglJvNxejKyTosQIU7paS",
+        "rol_id": 3,
+        "rol": "Estudiante"
+    }
+]

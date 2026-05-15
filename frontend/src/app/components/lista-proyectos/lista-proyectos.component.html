@@ -1,7 +1,7 @@
 <h1>Lista de Proyectos</h1>
 
 <!-- Botón que navega al formulario de creación -->
-<a routerLink="/nuevo" class="btn">Nuevo Proyecto</a>
+<a *ngIf="canManageProjects" routerLink="/nuevo" class="btn">Nuevo Proyecto</a>
 
 <!-- Mensaje de error si falla la conexión a PHP -->
 <div *ngIf="error" style="color:#dc2626; background:#fee; padding:15px; border-radius:8px; margin-bottom:15px;">

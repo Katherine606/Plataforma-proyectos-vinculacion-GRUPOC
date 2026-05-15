@@ -1,1 +1,39 @@
-/* Estilos en styles.css global */
+.asignacion-detalle {
+	margin-top: 10px;
+	border: 1px solid #dbe4ee;
+	border-radius: 10px;
+	background: #f8fafc;
+	overflow: hidden;
+}
+
+.asignacion-detalle summary {
+	list-style: none;
+	cursor: pointer;
+	padding: 12px 14px;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	gap: 10px;
+	font-weight: 600;
+	color: #334155;
+}
+
+.asignacion-detalle summary::-webkit-details-marker {
+	display: none;
+}
+
+.asignacion-total {
+	font-weight: 500;
+	font-size: 12px;
+	color: #64748b;
+}
+
+.asignacion-detalle ul {
+	margin: 0;
+	padding: 0 14px 12px 30px;
+}
+
+.asignacion-detalle li {
+	color: #1f2937;
+	margin: 4px 0;
+}

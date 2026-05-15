@@ -1,6 +1,10 @@
 <h1>Solicitudes de cupos</h1>
 
-<a (click)="resetearSolicitudes()"
+<div *ngIf="errorMsg" style="color:#dc2626; background:#fee; padding:12px; border-radius:8px; margin-bottom:15px;">
+  {{ errorMsg }}
+</div>
+
+<a *ngIf="rol === 'Coordinador'" (click)="resetearSolicitudes()"
    style="font-size:12px; color:#94a3b8; text-decoration:none; cursor:pointer; display:inline-block; margin-bottom:15px;">
   ↺ Resetear solicitudes (solo desarrollo)
 </a>
@@ -24,33 +28,57 @@
       </p>
     </div>
     <div class="solicitud-acciones">
-      <button class="btn btn-aceptar" (click)="confirmarAccion('aceptar', s)">Aceptar</button>
-      <button class="btn btn-denegar" (click)="confirmarAccion('denegar', s)">Denegar</button>
+      <ng-container *ngIf="canManageSolicitudes; else soloLecturaSolicitudes">
+        <button class="btn btn-aceptar" (click)="confirmarAccion('aceptar', s)">Aceptar</button>
+        <button class="btn btn-denegar" (click)="confirmarAccion('denegar', s)">Denegar</button>
+      </ng-container>
+      <ng-template #soloLecturaSolicitudes>
+        <span class="badge">Solo lectura</span>
+      </ng-template>
     </div>
   </div>
 
   <!-- SECCIÓN: PROCESADAS -->
-  <h2 *ngIf="procesadas.length > 0"
+  <h2 *ngIf="procesadasPorProyecto.length > 0"
       style="margin-top:30px; font-size:16px; color:#64748b;">
     Solicitudes procesadas
   </h2>
 
-  <div class="solicitud-card solicitud-procesada" *ngFor="let s of procesadas">
-    <div class="solicitud-info">
-      <strong>{{ s.estudiante }}</strong>
-      <p>
-        El estudiante <strong>{{ s.estudiante }}</strong>
-        solicitó entrar al proyecto
-        <strong>{{ s.nombre_proyecto }}</strong>
-      </p>
-    </div>
-    <div class="solicitud-acciones">
-      <span class="badge"
-            [class.badge-aceptado]="s.estado === 'aceptado'"
-            [class.badge-denegado]="s.estado === 'denegado'">
-        {{ s.estado === 'aceptado' ? '✓ Aceptado' : '✗ Denegado' }}
-      </span>
-    </div>
-  </div>
+  <details class="asignacion-detalle" *ngFor="let grupo of procesadasPorProyecto">
+    <summary>
+      <span>{{ grupo.nombreProyecto }}</span>
+      <span class="asignacion-total">A: {{ grupo.totalAceptadas }} | D: {{ grupo.totalDenegadas }}</span>
+    </summary>
+
+    <ul>
+      <li *ngFor="let s of grupo.solicitudes" style="display:flex; align-items:center; justify-content:space-between; gap:10px;">
+        <span>{{ s.estudiante }}</span>
+        <span class="badge"
+              [class.badge-aceptado]="s.estado === 'aceptado'"
+              [class.badge-denegado]="s.estado === 'denegado'">
+          {{ s.estado === 'aceptado' ? '✓ Aceptado' : '✗ Denegado' }}
+        </span>
+      </li>
+    </ul>
+  </details>
+
+  <h2 style="margin-top:32px; font-size:18px; color:#334155;">
+    Estudiantes asignados por proyecto
+  </h2>
+
+  <p *ngIf="asignacionesPorProyecto.length === 0" style="color:#888; margin-top:8px;">
+    Aún no hay estudiantes asignados a proyectos.
+  </p>
+
+  <details class="asignacion-detalle" *ngFor="let a of asignacionesPorProyecto">
+    <summary>
+      <span>{{ a.nombreProyecto }}</span>
+      <span class="asignacion-total">{{ a.estudiantes.length }} asignado(s)</span>
+    </summary>
+
+    <ul>
+      <li *ngFor="let estudiante of a.estudiantes">{{ estudiante }}</li>
+    </ul>
+  </details>
 
 </div>

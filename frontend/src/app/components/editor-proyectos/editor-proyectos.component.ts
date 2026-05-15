@@ -1,8 +1,10 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { HttpErrorResponse } from '@angular/common/http';
 import { ProyectoService } from '../../services/proyecto.service';
 import { Proyecto } from '../../models/proyecto.model';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-editor-proyectos',
@@ -29,23 +31,36 @@ export class EditorProyectosComponent implements OnInit {
   private _origTutor = '';
 
   tutoresDisponibles = ['Ing. Juan Pérez', 'Ing. María López'];
+  rol = '';
+  canManageProjects = false;
+  errorMsg = '';
 
   constructor(
     private proyectoService: ProyectoService,
+    private authService: AuthService,
     private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
+    this.rol = this.authService.getRole() ?? '';
+    this.canManageProjects = this.rol === 'Coordinador';
     this.cargarProyectos();
   }
 
   cargarProyectos(): void {
+    this.errorMsg = '';
     this.proyectoService.getProyectos().subscribe({
       next: (data) => {
         this.proyectos = data;
         this.cdr.detectChanges();
       },
-      error: (err) => console.error('Error al cargar proyectos:', err)
+      error: (err: HttpErrorResponse) => {
+        this.errorMsg = err.status === 403
+          ? 'No tienes permisos para consultar proyectos con tu rol actual.'
+          : 'No se pudieron cargar los proyectos. Intenta nuevamente.';
+        console.error('Error al cargar proyectos:', err);
+        this.cdr.detectChanges();
+      }
     });
   }
 
@@ -55,15 +70,26 @@ export class EditorProyectosComponent implements OnInit {
   }
 
   confirmarEliminar(p: Proyecto): void {
+    if (!this.canManageProjects) return;
+    this.errorMsg = '';
+
     if (confirm(`¿Estás seguro de que quieres eliminar el proyecto "${p.nombre}"?`)) {
       this.proyectoService.eliminarProyecto(p.id).subscribe({
         next: () => this.cargarProyectos(),
-        error: (err) => console.error('Error al eliminar:', err)
+        error: (err: HttpErrorResponse) => {
+          this.errorMsg = err.status === 403
+            ? 'Acceso denegado: tu rol no puede eliminar proyectos.'
+            : 'No se pudo eliminar el proyecto.';
+          console.error('Error al eliminar:', err);
+          this.cdr.detectChanges();
+        }
       });
     }
   }
 
   abrirEditor(p: Proyecto): void {
+    if (!this.canManageProjects) return;
+
     this.proyectoEditando = p;
     this.editNombre = p.nombre;
     this.editDescripcion = p.descripcion;
@@ -94,7 +120,8 @@ export class EditorProyectosComponent implements OnInit {
   }
 
   guardarCambios(): void {
-    if (!this.proyectoEditando) return;
+    if (!this.canManageProjects || !this.proyectoEditando) return;
+    this.errorMsg = '';
 
     const datos: Partial<Proyecto> = {
       nombre: this.editNombre,
@@ -107,7 +134,13 @@ export class EditorProyectosComponent implements OnInit {
         this.cerrarModal();
         this.cargarProyectos();
       },
-      error: (err) => console.error('Error al actualizar:', err)
+      error: (err: HttpErrorResponse) => {
+        this.errorMsg = err.status === 403
+          ? 'Acceso denegado: tu rol no puede editar proyectos.'
+          : 'No se pudo guardar los cambios del proyecto.';
+        console.error('Error al actualizar:', err);
+        this.cdr.detectChanges();
+      }
     });
   }
 
