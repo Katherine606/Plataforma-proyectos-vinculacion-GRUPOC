@@ -255,6 +255,63 @@ if ($recurso === 'solicitudes') {
         jsonResponse($solicitudes);
     }
 
+    // POST → crear solicitud (estudiante)
+    if ($metodo === 'POST' && $accion === '') {
+        autorizarRolOrFail($usuarioAuth, ['Estudiante'], 'Crear solicitud');
+        $data = getJsonBody();
+        $idProyecto = isset($data['id_proyecto']) ? (int)$data['id_proyecto'] : 0;
+
+        if ($idProyecto <= 0) {
+            jsonResponse(['error' => 'id_proyecto inválido'], 400);
+        }
+
+        // Buscar proyecto
+        $proyectoEncontrado = null;
+        foreach ($proyectos as &$p) {
+            if ($p['id'] === $idProyecto) {
+                $proyectoEncontrado = &$p;
+                break;
+            }
+        }
+        unset($p);
+
+        if ($proyectoEncontrado === null) {
+            jsonResponse(['error' => 'Proyecto no encontrado'], 404);
+        }
+
+        // Verificar cupos
+        if ($proyectoEncontrado['cupos_usados'] >= $proyectoEncontrado['cupos_max']) {
+            jsonResponse(['error' => 'No hay cupos disponibles'], 400);
+        }
+
+        // Evitar solicitudes duplicadas (pendiente o aceptada)
+        $estudianteId = $usuarioAuth['correo'] ?? 'desconocido';
+        foreach ($solicitudes as $s) {
+            if ($s['id_proyecto'] === $idProyecto && ($s['estudiante'] ?? '') === $estudianteId && in_array($s['estado'], ['pendiente', 'aceptado'], true)) {
+                jsonResponse(['error' => 'Ya existe una solicitud abierta para este proyecto'], 400);
+            }
+        }
+
+        // Crear solicitud
+        $nuevoId = 1;
+        if (!empty($solicitudes)) {
+            $nuevoId = max(array_column($solicitudes, 'id')) + 1;
+        }
+
+        $nuevaSolicitud = [
+            'id' => $nuevoId,
+            'estudiante' => $estudianteId,
+            'id_proyecto' => $idProyecto,
+            'nombre_proyecto' => $proyectoEncontrado['nombre'],
+            'estado' => 'pendiente',
+        ];
+
+        $solicitudes[] = $nuevaSolicitud;
+        guardarJson($rutaSolicitudes, $solicitudes);
+
+        jsonResponse($nuevaSolicitud, 201);
+    }
+
     if ($metodo === 'PUT' && $id !== null) {
         autorizarRolOrFail($usuarioAuth, ['Tutor'], 'Gestionar solicitud');
         $nuevoEstado = $accion === 'aceptar' ? 'aceptado' :

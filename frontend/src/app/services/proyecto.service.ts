@@ -70,4 +70,9 @@ export class ProyectoService {
   resetSolicitudes(): Observable<any> {
     return this.http.post<any>(`${this.apiUrl}?recurso=solicitudes&accion=reset`, {});
   }
+
+  /** Crea una nueva solicitud de inscripción (estudiante) */
+  crearSolicitud(idProyecto: number): Observable<Solicitud> {
+    return this.http.post<Solicitud>(`${this.apiUrl}?recurso=solicitudes`, { id_proyecto: idProyecto });
+  }
 }

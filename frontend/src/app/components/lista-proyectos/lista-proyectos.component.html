@@ -23,6 +23,7 @@
       <th>Facultad</th>
       <th>Carrera</th>
       <th>Cupos</th>
+      <th>Acciones</th>
     </tr>
   </thead>
   <tbody>
@@ -39,6 +40,13 @@
       <td>{{ p.facultad }}</td>
       <td>{{ p.carrera }}</td>
       <td>{{ p.cupos_usados }}/{{ p.cupos_max }}</td>
+      <td>
+        <button *ngIf="rol === 'Estudiante' && p.cupos_usados < p.cupos_max" (click)="inscribirse(p)">
+          Inscribirse
+        </button>
+      </td>
     </tr>
   </tbody>
 </table>
+
+<div *ngIf="mensajeExito" style="color:green; margin-top:10px;">{{ mensajeExito }}</div>
