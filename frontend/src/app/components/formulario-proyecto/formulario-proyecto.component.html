@@ -41,38 +41,34 @@
     <div class="form-right">
 
       <div class="form-group">
-        <label for="facultad">Facultad</label>
-        <select id="facultad" formControlName="facultad"
-                [class.input-error]="errorRequerido('facultad', 'x')">
-          <option value="">-- Seleccionar --</option>
-          <option value="Ciencias Matemáticas y Físicas">Ciencias Matemáticas y Físicas</option>
-          <option value="Medicina">Medicina</option>
-          <option value="Jurisprudencia">Jurisprudencia</option>
+        <label for="facultad_id">Facultad</label>
+        <select id="facultad_id" formControlName="facultad_id"
+                [class.input-error]="errorRequerido('facultad_id', 'x')">
+          <option [ngValue]="null">-- Seleccionar --</option>
+          <option *ngFor="let f of facultades" [ngValue]="f.id">{{ f.nombre }}</option>
         </select>
-        <span class="error-msg">{{ errorRequerido('facultad', 'Selecciona una facultad.') }}</span>
+        <span class="error-msg">{{ errorRequerido('facultad_id', 'Selecciona una facultad.') }}</span>
       </div>
 
       <div class="form-group">
-        <label for="carrera">Carrera</label>
-        <select id="carrera" formControlName="carrera"
-                [class.input-error]="errorRequerido('carrera', 'x')">
-          <option value="">-- Seleccionar --</option>
-          <option value="Software">Software</option>
-          <option value="TIC">TIC</option>
-          <option value="Sistemas">Sistemas</option>
+        <label for="carrera_id">Carrera</label>
+        <select id="carrera_id" formControlName="carrera_id"
+                [class.input-error]="errorRequerido('carrera_id', 'x')"
+                [disabled]="!form.get('facultad_id')?.value">
+          <option [ngValue]="null">-- Seleccionar --</option>
+          <option *ngFor="let c of carrerasFiltradas" [ngValue]="c.id">{{ c.nombre }}</option>
         </select>
-        <span class="error-msg">{{ errorRequerido('carrera', 'Selecciona una carrera.') }}</span>
+        <span class="error-msg">{{ errorRequerido('carrera_id', 'Selecciona una carrera.') }}</span>
       </div>
 
       <div class="form-group">
-        <label for="tutor">Tutores disponibles</label>
-        <select id="tutor" formControlName="tutor"
-                [class.input-error]="errorRequerido('tutor', 'x')">
-          <option value="">-- Seleccionar --</option>
-          <option value="Ing. Juan Pérez">Ing. Juan Pérez</option>
-          <option value="Ing. María López">Ing. María López</option>
+        <label for="tutor_id">Tutor disponible</label>
+        <select id="tutor_id" formControlName="tutor_id"
+                [class.input-error]="errorRequerido('tutor_id', 'x')">
+          <option [ngValue]="null">-- Seleccionar --</option>
+          <option *ngFor="let t of tutores" [ngValue]="t.id">{{ t.nombre }} {{ t.apellido }}</option>
         </select>
-        <span class="error-msg">{{ errorRequerido('tutor', 'Selecciona un tutor.') }}</span>
+        <span class="error-msg">{{ errorRequerido('tutor_id', 'Selecciona un tutor.') }}</span>
       </div>
 
       <div class="form-group">

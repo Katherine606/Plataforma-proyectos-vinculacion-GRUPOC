@@ -1,10 +1,16 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { HttpErrorResponse } from '@angular/common/http';
+import { HttpErrorResponse, HttpClient } from '@angular/common/http';
 import { ProyectoService } from '../../services/proyecto.service';
 import { Proyecto } from '../../models/proyecto.model';
 import { AuthService } from '../../services/auth.service';
+
+interface Tutor {
+  id: number;
+  nombre: string;
+  apellido: string;
+}
 
 @Component({
   selector: 'app-editor-proyectos',
@@ -23,28 +29,40 @@ export class EditorProyectosComponent implements OnInit {
 
   editNombre = '';
   editDescripcion = '';
-  editTutor = '';
+  editTutorId: number | null = null;
   editTutorBloqueado = true;
 
   private _origNombre = '';
   private _origDescripcion = '';
-  private _origTutor = '';
+  private _origTutorId: number | null = null;
 
-  tutoresDisponibles = ['Ing. Juan Pérez', 'Ing. María López'];
+  tutores: Tutor[] = [];
+  carrerasUnicas: string[] = [];
   rol = '';
   canManageProjects = false;
   errorMsg = '';
 
+  private readonly apiUrl = 'http://localhost:8000/index.php';
+
   constructor(
     private proyectoService: ProyectoService,
     private authService: AuthService,
+    private http: HttpClient,
     private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
     this.rol = this.authService.getRole() ?? '';
     this.canManageProjects = this.rol === 'Coordinador';
+    this.cargarTutores();
     this.cargarProyectos();
+  }
+
+  cargarTutores(): void {
+    this.http.get<Tutor[]>(`${this.apiUrl}?recurso=tutores`).subscribe({
+      next: (data) => { this.tutores = data; this.cdr.detectChanges(); },
+      error: () => { console.error('Error al cargar tutores'); }
+    });
   }
 
   cargarProyectos(): void {
@@ -52,6 +70,7 @@ export class EditorProyectosComponent implements OnInit {
     this.proyectoService.getProyectos().subscribe({
       next: (data) => {
         this.proyectos = data;
+        this.carrerasUnicas = [...new Set(data.map(p => p.carrera).filter(Boolean))];
         this.cdr.detectChanges();
       },
       error: (err: HttpErrorResponse) => {
@@ -93,11 +112,15 @@ export class EditorProyectosComponent implements OnInit {
     this.proyectoEditando = p;
     this.editNombre = p.nombre;
     this.editDescripcion = p.descripcion;
-    this.editTutor = p.tutor;
+    // Buscar el tutor_id por el nombre del tutor
+    const tutorEncontrado = this.tutores.find(
+      t => `${t.nombre} ${t.apellido}` === p.tutor
+    );
+    this.editTutorId = tutorEncontrado?.id ?? null;
     this.editTutorBloqueado = true;
     this._origNombre = p.nombre;
     this._origDescripcion = p.descripcion;
-    this._origTutor = p.tutor;
+    this._origTutorId = this.editTutorId;
     this.modalAbierto = true;
   }
 
@@ -110,7 +133,7 @@ export class EditorProyectosComponent implements OnInit {
     if (confirm('¿Estás seguro de que quieres cancelar? Se perderán los cambios realizados.')) {
       this.editNombre = this._origNombre;
       this.editDescripcion = this._origDescripcion;
-      this.editTutor = this._origTutor;
+      this.editTutorId = this._origTutorId;
       this.editTutorBloqueado = true;
     }
   }
@@ -123,11 +146,15 @@ export class EditorProyectosComponent implements OnInit {
     if (!this.canManageProjects || !this.proyectoEditando) return;
     this.errorMsg = '';
 
-    const datos: Partial<Proyecto> = {
+    const datos: any = {
       nombre: this.editNombre,
       descripcion: this.editDescripcion,
-      tutor: this.editTutor
     };
+
+    // Solo enviar tutor_id si se cambió
+    if (this.editTutorId) {
+      datos.tutor_id = this.editTutorId;
+    }
 
     this.proyectoService.actualizarProyecto(this.proyectoEditando.id, datos).subscribe({
       next: () => {
@@ -147,5 +174,10 @@ export class EditorProyectosComponent implements OnInit {
   get cuposRestantes(): number {
     if (!this.proyectoEditando) return 0;
     return this.proyectoEditando.cupos_max - this.proyectoEditando.cupos_usados;
+  }
+
+  getNombreTutor(tutorId: number): string {
+    const t = this.tutores.find(t => t.id === tutorId);
+    return t ? `${t.nombre} ${t.apellido}` : 'Sin tutor';
   }
 }

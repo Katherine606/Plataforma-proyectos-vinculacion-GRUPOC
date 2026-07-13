@@ -1,0 +1,324 @@
+================================================================================
+ PLAN DE PRUEBAS ACTUALIZADO - Plataforma de Gestión de Proyectos de Vinculación
+================================================================================
+
+================================================================================
+CASOS DE PRUEBA - MÓDULO 1: AUTENTICACIÓN
+================================================================================
+
+Caso de Prueba 1: Autenticación exitosa
+----------------------------------------
+Código: CP-001
+Caso de prueba: Ingreso al sistema mediante credenciales válidas (Login)
+Responsable: Desarrolladores
+Descripción de la prueba:
+  Parámetros:
+    Correo: coordinador@ug.edu.ec
+    Contraseña: Coord123*
+  Hacer clic en el botón "Iniciar Sesión".
+Requisito previo: El usuario debe estar registrado en la BD con estado activo.
+Resultado esperado: El usuario será autenticado y redirigido al dashboard
+  principal del sistema.
+Resultado obtenido: Se ha ingresado correctamente el usuario a la aplicación.
+Estado: Exitoso
+Observaciones: Se generó correctamente el token JWT de sesión.
+
+Caso de Prueba 7: Credenciales incorrectas
+-------------------------------------------
+Código: CP-007
+Caso de prueba: Ingreso con contraseña incorrecta
+Responsable: Desarrolladores
+Descripción de la prueba:
+  Parámetros:
+    Correo: coordinador@ug.edu.ec
+    Contraseña: incorrecta123
+  Hacer clic en el botón "Iniciar Sesión".
+Requisito previo: El usuario debe existir en la BD.
+Resultado esperado: El sistema muestra "Credenciales inválidas" y no redirige.
+Resultado obtenido: Se mostró el mensaje de error correctamente.
+Estado: Exitoso
+Observaciones: El backend retorna HTTP 401.
+
+Caso de Prueba 8: Email inexistente
+------------------------------------
+Código: CP-008
+Caso de prueba: Ingreso con correo que no existe en la BD
+Responsable: Desarrolladores
+Descripción de la prueba:
+  Parámetros:
+    Correo: noexiste@ug.edu.ec
+    Contraseña: cualquier123
+  Hacer clic en el botón "Iniciar Sesión".
+Requisito previo: Ninguna.
+Resultado esperado: El sistema muestra "Credenciales inválidas".
+Resultado obtenido: Se mostró el mensaje de error correctamente.
+Estado: Exitoso
+Observaciones: Por seguridad no se revela si el correo existe o no.
+
+Caso de Prueba 9: Campos vacíos
+--------------------------------
+Código: CP-009
+Caso de prueba: Ingreso con campos vacíos
+Responsable: Desarrolladores
+Descripción de la prueba:
+  Parámetros:
+    Correo: (vacío)
+    Contraseña: (vacío)
+  Hacer clic en el botón "Iniciar Sesión".
+Requisito previo: Ninguna.
+Resultado esperado: El sistema muestra "Email y password son obligatorios".
+Resultado obtenido: Se validaron los campos en el frontend y backend.
+Estado: Exitoso
+Observaciones: El formulario de Angular también bloquea el envío.
+
+Caso de Prueba 10: Usuario inactivo
+------------------------------------
+Código: CP-010
+Caso de prueba: Ingreso con usuario inactivo
+Responsable: Desarrolladores
+Descripción de la prueba:
+  Preparación: UPDATE usuarios SET estado='inactivo' WHERE id_usuario=1
+  Parámetros:
+    Correo: coordinador@ug.edu.ec
+    Contraseña: Coord123*
+Requisito previo: El usuario tiene estado "inactivo" en la BD.
+Resultado esperado: El sistema muestra "Credenciales inválidas".
+Resultado obtenido: El login rechazó al usuario inactivo.
+Estado: Exitoso
+Observaciones: El usuario debe ser reactivado manualmente en la BD.
+
+Caso de Prueba 11: Token expirado
+----------------------------------
+Código: CP-011
+Caso de prueba: Acceso con token JWT expirado (mayor a 2 horas)
+Responsable: Desarrolladores
+Descripción de la prueba:
+  Preparación: Usar un token con fecha exp pasada.
+  Intentar acceder a GET /api/proyectos.
+Requisito previo: Tener un token expirado.
+Resultado esperado: El backend retorna "Token inválido o expirado" (403).
+Resultado obtenido: El sistema rechazó el token expirado.
+Estado: Exitoso
+Observaciones: El token tiene TTL de 2 horas (7200 segundos).
+
+Caso de Prueba 12: Ruta protegida sin token
+--------------------------------------------
+Código: CP-012
+Caso de prueba: Acceder a /api/proyectos sin Bearer token
+Responsable: Desarrolladores
+Descripción de la prueba:
+  Abrir navegador → ir a http://localhost:8000/index.php?recurso=proyectos
+  (sin header Authorization).
+Requisito previo: Ninguna.
+Resultado esperado: El backend retorna "Token no enviado" (403).
+Resultado obtenido: Se bloqueó el acceso sin token.
+Estado: Exitoso
+Observaciones: El frontend redirige al login si no hay token.
+
+Caso de Prueba 13: Estudiante accede a ruta de Coordinador
+-----------------------------------------------------------
+Código: CP-013
+Caso de prueba: Token de estudiante intentando crear proyecto
+Responsable: Desarrolladores
+Descripción de la prueba:
+  Login como estudiante → intentar POST /api/proyectos.
+Requisito previo: Estar logueado como Estudiante.
+Resultado esperado: El backend retorna "Acceso denegado" (403).
+Resultado obtenido: Se bloqueó correctamente por rol.
+Estado: Exitoso
+Observaciones: RoleGuard también bloquea en el frontend.
+
+================================================================================
+CASOS DE PRUEBA - MÓDULO 2: GESTIÓN DE PROYECTOS
+================================================================================
+
+Caso de Prueba 2: Creación de proyecto exitosa
+----------------------------------------------
+Código: CP-002
+Caso de prueba: Registro de un nuevo proyecto de vinculación
+Responsable: Desarrolladores
+Descripción de la prueba:
+  Login como Coordinador → ir a "Nuevo proyecto" → llenar formulario:
+    Nombre: Proyecto de Prueba
+    Descripción: Descripción del proyecto de prueba
+    Facultad: (seleccionar de la BD)
+    Carrera: (seleccionar de la BD)
+    Tutor: (seleccionar de la BD)
+    Cupos: 15
+  Hacer clic en "Guardar".
+Requisito previo: Haber ingresado con rol de Coordinador.
+Resultado esperado: El proyecto se crea en la BD y se redirige al editor.
+Resultado obtenido: Se creó el proyecto correctamente.
+Estado: Exitoso
+Observaciones: Los datos de facultad, carrera y tutor se cargan desde MySQL.
+
+Caso de Prueba 3: Validación de campos obligatorios
+----------------------------------------------------
+Código: CP-003
+Caso de prueba: Creación de proyecto con campos obligatorios faltantes
+Responsable: Desarrolladores
+Descripción de la prueba:
+  Login como Coordinador → ir a "Nuevo proyecto" → dejar campos vacíos:
+    Nombre: Proyecto de Prueba
+    Tutor: (vacío)
+  Hacer clic en "Guardar".
+Requisito previo: Haber ingresado con rol de Coordinador.
+Resultado esperado: El sistema bloquea el envío y muestra alerta de validación.
+Resultado obtenido: El sistema no permitió registrar el proyecto.
+Estado: Exitoso
+Observaciones: La validación funciona tanto en frontend (Angular) como backend (PHP).
+
+Caso de Prueba 14: Crear proyecto con tutor inválido
+-----------------------------------------------------
+Código: CP-014
+Caso de prueba: Intentar crear proyecto con tutor_id inexistente
+Responsable: Desarrolladores
+Descripción de la prueba:
+  Enviar POST /api/proyectos con tutor_id = 999 (no existe en BD).
+Requisito previo: Haber ingresado con rol de Coordinador.
+Resultado esperado: El backend retorna "El tutor seleccionado no es válido" (400).
+Resultado obtenido: Se validó correctamente la existencia del tutor.
+Estado: Exitoso
+Observaciones: El frontend solo muestra tutores activos de la BD.
+
+Caso de Prueba 15: Cupos mayores a 60
+--------------------------------------
+Código: CP-015
+Caso de prueba: Intentar crear proyecto con cupos > 60
+Responsable: Desarrolladores
+Descripción de la prueba:
+  Login como Coordinador → crear proyecto con cupos = 100.
+Requisito previo: Haber ingresado con rol de Coordinador.
+Resultado esperado: El sistema limita los cupos a 60.
+Resultado obtenido: El backend ajusta a 60 máximo.
+Estado: Exitoso
+Observaciones: Frontend también valida max=60 en el input HTML.
+
+Caso de Prueba 16: Estudiante no puede crear proyecto
+------------------------------------------------------
+Código: CP-016
+Caso de prueba: Intentar acceder a /nuevo como Estudiante
+Responsable: Desarrolladores
+Descripción de la prueba:
+  Login como Estudiante → intentar navegar a /nuevo.
+Requisito previo: Haber ingresado con rol de Estudiante.
+Resultado esperado: RoleGuard redirige a la raíz (/).
+Resultado obtenido: El estudiante no ve la opción en el sidebar.
+Estado: Exitoso
+Observaciones: El enlace "Nuevo proyecto" solo aparece para Coordinador.
+
+Caso de Prueba 17: Tutor no puede crear proyecto
+-------------------------------------------------
+Código: CP-017
+Caso de prueba: Intentar acceder a /nuevo como Tutor
+Responsable: Desarrolladores
+Descripción de la prueba:
+  Login como Tutor → intentar navegar a /nuevo.
+Requisito previo: Haber ingresado con rol de Tutor.
+Resultado esperado: RoleGuard redirige a la raíz (/).
+Resultado obtenido: El tutor no ve la opción en el sidebar.
+Estado: Exitoso
+Observaciones: El enlace "Nuevo proyecto" solo aparece para Coordinador.
+
+Caso de Prueba 18: Editar proyecto
+-----------------------------------
+Código: CP-018
+Caso de prueba: Coordinador edita nombre y tutor de un proyecto
+Responsable: Desarrolladores
+Descripción de la prueba:
+  Login como Coordinador → ir a "Editor de proyectos" → clic "Editar"
+  en un proyecto → modificar nombre → clic "Guardar".
+Requisito previo: Haber ingresado con rol de Coordinador. Debe existir un proyecto.
+Resultado esperado: El proyecto se actualiza en la BD.
+Resultado obtenido: Se actualizó correctamente.
+Estado: Exitoso
+Observaciones: Se muestra el nombre del tutor en el modal de edición.
+
+Caso de Prueba 19: Eliminar proyecto
+-------------------------------------
+Código: CP-019
+Caso de prueba: Coordinador elimina un proyecto
+Responsable: Desarrolladores
+Descripción de la prueba:
+  Login como Coordinador → ir a "Editor de proyectos" → clic ícono 🗑
+  en un proyecto → confirmar eliminación.
+Requisito previo: Haber ingresado con rol de Coordinador. Debe existir un proyecto.
+Resultado esperado: El proyecto desaparece de la lista.
+Resultado obtenido: Se eliminó correctamente de la BD.
+Estado: Exitoso
+Observaciones: La eliminación es permanente (DELETE físico).
+
+Caso de Prueba 20: Verificar datos desde MySQL
+-----------------------------------------------
+Código: CP-020
+Caso de prueba: Verificar que la lista de proyectos muestra datos de MySQL
+Responsable: Desarrolladores
+Descripción de la prueba:
+  Login como cualquier rol → ir a "Lista de proyectos".
+  Verificar que se muestran los proyectos insertados en la BD.
+Requisito previo: Haber insertado proyectos de prueba en MySQL.
+Resultado esperado: Se muestran los proyectos con tutor, facultad y carrera
+  resueltos desde las tablas relacionadas (JOIN).
+Resultado obtenido: Los datos se muestran correctamente.
+Estado: Exitoso
+Observaciones: Los JOINs resuelven los nombres desde las tablas.
+
+================================================================================
+CASOS DE PRUEBA - MÓDULO 3: INSCRIPCIÓN DE ESTUDIANTES
+================================================================================
+
+Caso de Prueba 21: Inscripción a proyecto
+------------------------------------------
+Código: CP-021
+Caso de prueba: Estudiante se inscribe a un proyecto con cupos disponibles
+Responsable: Desarrolladores
+Descripción de la prueba:
+  Login como Estudiante → ver lista de proyectos → clic "Inscribirse".
+Requisito previo: El proyecto debe tener cupos_usados < cupos_max.
+Resultado esperado: Se crea una solicitud con estado "pendiente".
+Resultado obtenido: Se registró la solicitud correctamente.
+Estado: Exitoso
+Observaciones: El sistema valida duplicados (no puede inscribirse 2 veces).
+
+Caso de Prueba 22: Sin cupos disponibles
+-----------------------------------------
+Código: CP-022
+Caso de prueba: Estudiante intenta inscribirse a proyecto sin cupos
+Responsable: Desarrolladores
+Descripción de la prueba:
+  Login como Estudiante → intentar inscribirse a proyecto lleno.
+Requisito previo: El proyecto debe tener cupos_usados >= cupos_max.
+Resultado esperado: El sistema muestra "No hay cupos disponibles".
+Resultado obtenido: Se bloqueó la inscripción correctamente.
+Estado: Exitoso
+Observaciones: La validación se hace con transacción MySQL.
+
+================================================================================
+CASOS DE PRUEBA - MÓDULO 4: SOLICITUDES (TUTOR/COORDINADOR)
+================================================================================
+
+Caso de Prueba 23: Aceptar solicitud
+-------------------------------------
+Código: CP-023
+Caso de prueba: Tutor acepta una solicitud de inscripción
+Responsable: Desarrolladores
+Descripción de la prueba:
+  Login como Tutor → ir a "Solicitudes" → clic "Aceptar" en una solicitud.
+Requisito previo: Debe haber solicitudes pendientes.
+Resultado esperado: La solicitud cambia a "aceptada" y cupos_usados +1.
+Resultado obtenido: Se actualizó correctamente con transacción.
+Estado: Exitoso
+Observaciones: La transacción MySQL garantiza integridad de cupos.
+
+Caso de Prueba 24: Denegar solicitud
+-------------------------------------
+Código: CP-024
+Caso de prueba: Tutor deniega una solicitud de inscripción
+Responsable: Desarrolladores
+Descripción de la prueba:
+  Login como Tutor → ir a "Solicitudes" → clic "Denegar" en una solicitud.
+Requisito previo: Debe haber solicitudes pendientes.
+Resultado esperado: La solicitud cambia a "denegada" y cupos NO se modifican.
+Resultado obtenido: Se actualizó correctamente.
+Estado: Exitoso
+Observaciones: Los cupos no se ven afectados al denegar.

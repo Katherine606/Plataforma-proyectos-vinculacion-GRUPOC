@@ -1,7 +1,7 @@
 
 CREATE DATABASE IF NOT EXISTS vinculacion_db
-CHARACTER SET utf8mb4 --para soportar caracteres especiales y emojis
-COLLATE utf8mb4_unicode_ci; --para soportar caracteres especiales y emojis
+CHARACTER SET utf8mb4 
+COLLATE utf8mb4_unicode_ci; 
 
 USE vinculacion_db;
 
@@ -39,7 +39,8 @@ CREATE TABLE usuarios (
 INSERT INTO usuarios (nombre, apellido, correo, password, rol_id, estado) VALUES
 ('Carlos', 'Mendoza', 'coordinador@ug.edu.ec', '$2y$10$RVPD53pWTuJoTJ8wz192v.foxVvfne1hq5.Vpph6ViUCNP2zWTJAa', 1, 'activo'),
 ('Laura', 'Torres', 'tutor@ug.edu.ec', '$2y$10$GPlfUkjjLQX2oOBrvoRbe.GpWnTUj/gQBVn3ofhxMOK4pE7U9VraO', 2, 'activo'),
-('Ana', 'Garcia', 'estudiante@ug.edu.ec', '$2y$10$zfS8wP7xyDMcOE8KkoiTHuMPyjzcpgdSqMxqm6YfkiAXcvdEdwxMC', 3, 'activo');
+('Ana', 'Garcia', 'estudiante@ug.edu.ec', '$2y$10$zfS8wP7xyDMcOE8KkoiTHuMPyjzcpgdSqMxqm6YfkiAXcvdEdwxMC', 3, 'activo'),
+('Pedro', 'Ramirez', 'tutor2@ug.edu.ec', '$2y$10$GPlfUkjjLQX2oOBrvoRbe.GpWnTUj/gQBVn3ofhxMOK4pE7U9VraO', 2, 'activo');
 
 -- ============================================
 -- TABLA: facultades
@@ -116,3 +117,18 @@ CREATE TABLE horas_vinculacion (
     FOREIGN KEY (proyecto_id) REFERENCES proyectos(id_proyecto),
     FOREIGN KEY (tutor_id) REFERENCES usuarios(id_usuario)
 );
+
+-- ============================================
+-- PROYECTOS DE PRUEBA
+-- ============================================
+INSERT INTO proyectos (nombre, descripcion, tutor_id, facultad_id, carrera_id, cupos_max, cupos_usados, estado) VALUES
+('Alfabetización Digital', 'Proyecto de apoyo digital a comunidades rurales.', 2, 1, 1, 30, 5, 'activo'),
+('Salud Comunitaria Web', 'Plataforma web para gestión de salud comunitaria.', 2, 2, 3, 25, 10, 'activo'),
+('Desarrollo de Software Educativo', 'Aplicación web para apoyo educativo.', 2, 1, 1, 20, 0, 'activo');
+
+-- ============================================
+-- SOLICITUDES DE PRUEBA
+-- ============================================
+INSERT INTO solicitudes (estudiante_id, proyecto_id, estado, fecha_solicitud) VALUES
+(3, 1, 'aceptada', NOW()),
+(3, 2, 'pendiente', NOW());

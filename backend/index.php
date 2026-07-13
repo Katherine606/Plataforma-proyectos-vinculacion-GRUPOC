@@ -103,6 +103,43 @@ if ($recurso === 'auth') {
     jsonResponse(['error' => 'Endpoint de auth no encontrado'], 404);
 }
 
+// ─── TUTORES ──────────────────────────────────────────────────────────────────
+if ($recurso === 'tutores') {
+    if ($metodo === 'GET' && $accion === '') {
+        autenticarOrFail($jwtHelper);
+        $stmt = $db->query("
+            SELECT id_usuario as id, nombre, apellido, correo
+            FROM usuarios WHERE rol_id = 2 AND estado = 'activo'
+            ORDER BY nombre
+        ");
+        jsonResponse($stmt->fetchAll());
+    }
+}
+
+// ─── FACULTADES ───────────────────────────────────────────────────────────────
+if ($recurso === 'facultades') {
+    if ($metodo === 'GET' && $accion === '') {
+        autenticarOrFail($jwtHelper);
+        $stmt = $db->query("SELECT id_facultad as id, nombre FROM facultades ORDER BY nombre");
+        jsonResponse($stmt->fetchAll());
+    }
+}
+
+// ─── CARRERAS ─────────────────────────────────────────────────────────────────
+if ($recurso === 'carreras') {
+    if ($metodo === 'GET' && $accion === '') {
+        autenticarOrFail($jwtHelper);
+        $facultadId = isset($_GET['facultad_id']) ? (int) $_GET['facultad_id'] : null;
+        if ($facultadId) {
+            $stmt = $db->prepare("SELECT id_carrera as id, nombre FROM carreras WHERE facultad_id = :fid ORDER BY nombre");
+            $stmt->execute([':fid' => $facultadId]);
+        } else {
+            $stmt = $db->query("SELECT id_carrera as id, nombre, facultad_id FROM carreras ORDER BY nombre");
+        }
+        jsonResponse($stmt->fetchAll());
+    }
+}
+
 // ─── PROTECCIÓN DE RUTAS ──────────────────────────────────────────────────────
 $recursosProtegidos = ['proyectos', 'solicitudes'];
 $usuarioAuth = null;

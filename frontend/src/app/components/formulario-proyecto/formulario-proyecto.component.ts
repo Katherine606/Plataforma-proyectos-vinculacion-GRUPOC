@@ -1,4 +1,4 @@
-import { Component, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
 import { RouterLink, Router } from '@angular/router';
@@ -6,6 +6,25 @@ import {
   FormBuilder, FormGroup, Validators, ReactiveFormsModule, AbstractControl, ValidationErrors
 } from '@angular/forms';
 import { ProyectoService } from '../../services/proyecto.service';
+import { HttpClient } from '@angular/common/http';
+
+interface Tutor {
+  id: number;
+  nombre: string;
+  apellido: string;
+  correo: string;
+}
+
+interface Facultad {
+  id: number;
+  nombre: string;
+}
+
+interface Carrera {
+  id: number;
+  nombre: string;
+  facultad_id: number;
+}
 
 @Component({
   selector: 'app-formulario-proyecto',
@@ -14,26 +33,70 @@ import { ProyectoService } from '../../services/proyecto.service';
   templateUrl: './formulario-proyecto.component.html',
   styleUrl: './formulario-proyecto.component.css'
 })
-export class FormularioProyectoComponent {
+export class FormularioProyectoComponent implements OnInit {
 
   form: FormGroup;
   enviando = false;
   errorEnvio = '';
-  tutoresDisponibles = ['Ing. Juan Pérez', 'Ing. María López'];
+
+  tutores: Tutor[] = [];
+  facultades: Facultad[] = [];
+  carreras: Carrera[] = [];
+  carrerasFiltradas: Carrera[] = [];
+
+  private readonly apiUrl = 'http://localhost:8000/index.php';
 
   constructor(
     private fb: FormBuilder,
     private proyectoService: ProyectoService,
+    private http: HttpClient,
     private router: Router,
     private cdr: ChangeDetectorRef
   ) {
     this.form = this.fb.group({
       nombre:      ['', [Validators.required, this.validarNombreConSentido]],
       descripcion: ['', [Validators.required]],
-      facultad:    ['', [Validators.required]],
-      carrera:     ['', [Validators.required]],
-      tutor:       ['', [Validators.required]],
+      facultad_id: [null, [Validators.required]],
+      carrera_id:  [null, [Validators.required]],
+      tutor_id:    [null, [Validators.required]],
       cupos_max:   [null, [Validators.required, Validators.min(1), Validators.max(60)]]
+    });
+  }
+
+  ngOnInit(): void {
+    this.cargarTutores();
+    this.cargarFacultades();
+    this.cargarCarreras();
+
+    // Cuando cambia la facultad, filtrar las carreras
+    this.form.get('facultad_id')?.valueChanges.subscribe(facultadId => {
+      this.form.patchValue({ carrera_id: null });
+      if (facultadId) {
+        this.carrerasFiltradas = this.carreras.filter(c => c.facultad_id === facultadId);
+      } else {
+        this.carrerasFiltradas = [];
+      }
+    });
+  }
+
+  cargarTutores(): void {
+    this.http.get<Tutor[]>(`${this.apiUrl}?recurso=tutores`).subscribe({
+      next: (data) => { this.tutores = data; this.cdr.detectChanges(); },
+      error: () => { console.error('Error al cargar tutores'); }
+    });
+  }
+
+  cargarFacultades(): void {
+    this.http.get<Facultad[]>(`${this.apiUrl}?recurso=facultades`).subscribe({
+      next: (data) => { this.facultades = data; this.cdr.detectChanges(); },
+      error: () => { console.error('Error al cargar facultades'); }
+    });
+  }
+
+  cargarCarreras(): void {
+    this.http.get<Carrera[]>(`${this.apiUrl}?recurso=carreras`).subscribe({
+      next: (data) => { this.carreras = data; this.cdr.detectChanges(); },
+      error: () => { console.error('Error al cargar carreras'); }
     });
   }
 
@@ -64,7 +127,6 @@ export class FormularioProyectoComponent {
     if (c.errors['required'])          return 'El nombre del proyecto es obligatorio.';
     if (c.errors['soloLetras'])        return 'Solo se permiten letras y espacios.';
     if (c.errors['pocasPalabras'])     return 'Ingresa al menos dos palabras.';
-    if (c.errors['palabraSinSentido']) return 'Ingresa un nombre válido.';
     return '';
   }
 
@@ -85,43 +147,36 @@ export class FormularioProyectoComponent {
     this.form.markAllAsTouched();
     if (this.form.invalid) return;
 
-    if (!this.tutoresDisponibles.includes(this.form.value.tutor ?? '')) {
-      this.errorEnvio = 'Selecciona un tutor válido.';
-      return;
-    }
-
     this.enviando = true;
     this.errorEnvio = '';
     this.cdr.detectChanges();
 
     this.proyectoService.crearProyecto(this.form.value).subscribe({
       next: () => {
-        // Navegar al editor después de guardar
         this.router.navigate(['/editor']);
       },
       error: (err: HttpErrorResponse) => {
         console.error('Error al crear proyecto:', err);
         this.errorEnvio = err.status === 403
           ? 'Acceso denegado: tu rol no puede crear proyectos.'
-          : 'No se pudo guardar. Verifica que el servidor PHP esté corriendo.';
+          : (err.error?.error || 'No se pudo guardar. Verifica que el servidor PHP esté corriendo.');
         this.enviando = false;
         this.cdr.detectChanges();
       }
     });
   }
 
-  /** Cancelar: limpia campos pero deja los selects en "-- Seleccionar --" */
   confirmarCancelar(): void {
     if (confirm('¿Estás seguro de que quieres cancelar? Se perderán los datos ingresados.')) {
-      // reset con valores explícitos para que los selects queden en "-- Seleccionar --"
       this.form.reset({
         nombre: '',
         descripcion: '',
-        facultad: '',
-        carrera: '',
-        tutor: '',
+        facultad_id: null,
+        carrera_id: null,
+        tutor_id: null,
         cupos_max: null
       });
+      this.carrerasFiltradas = [];
     }
   }
 }

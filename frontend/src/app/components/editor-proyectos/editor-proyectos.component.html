@@ -2,12 +2,10 @@
   <h1>Editor de proyectos</h1>
 
   <div class="filtros">
-    <strong>Filtros ☰</strong>
+    <strong>Filtros</strong>
     <select [(ngModel)]="filtroCarrera">
       <option value="">Todas las carreras</option>
-      <option value="Software">Software</option>
-      <option value="TIC">TIC</option>
-      <option value="Sistemas">Sistemas</option>
+      <option *ngFor="let c of carrerasUnicas" [value]="c">{{ c }}</option>
     </select>
   </div>
 </div>
@@ -79,9 +77,9 @@
       <div class="modal-right">
         <div class="form-group">
           <label for="editTutor">Tutor</label>
-          <!-- Bloqueado por defecto -->
-          <select id="editTutor" [(ngModel)]="editTutor" [disabled]="editTutorBloqueado">
-            <option *ngFor="let t of tutoresDisponibles" [value]="t">{{ t }}</option>
+          <select id="editTutor" [(ngModel)]="editTutorId" [disabled]="editTutorBloqueado">
+            <option [ngValue]="null">-- Seleccionar --</option>
+            <option *ngFor="let t of tutores" [ngValue]="t.id">{{ t.nombre }} {{ t.apellido }}</option>
           </select>
         </div>
         <button type="button" class="btn btn-warning" (click)="habilitarTutor()">
