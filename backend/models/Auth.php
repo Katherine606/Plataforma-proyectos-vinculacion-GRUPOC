@@ -1,80 +1,55 @@
 <?php
+/**
+ * ====================================================================
+ * Modelo de Autenticación 1
+ * --------------------------------------------------------------------
+ * Gestiona el login de usuarios consultando MySQL
+ * ====================================================================
+ */
+
+require_once __DIR__ . '/../config/database.php';
 
 class Auth
 {
-    private string $rutaUsuarios;
+    private PDO $db;
 
-    public function __construct(string $rutaUsuarios)
+    public function __construct()
     {
-        $this->rutaUsuarios = $rutaUsuarios;
-        $this->inicializarUsuariosSiNoExiste();
+        $this->db = Database::getInstance()->getConnection();
     }
 
+    //Valida las credenciales del usuario contra MySQL y retorna los datos del usuario si es válido, null si no
     public function login(string $email, string $password): ?array
     {
-        $usuarios = $this->leerUsuarios();
+        $stmt = $this->db->prepare("
+            SELECT u.id_usuario, u.nombre, u.apellido, u.correo, u.password, u.rol_id, u.estado, r.nombre as rol
+            FROM usuarios u JOIN roles r ON u.rol_id = r.id_rol WHERE u.correo = :correo LIMIT 1
+        ");
+        $stmt->execute([':correo' => $email]);
+        $usuario = $stmt->fetch();
 
-        foreach ($usuarios as $usuario) {
-            if (($usuario['correo'] ?? '') !== $email) {
-                continue;
-            }
-
-            if (!password_verify($password, $usuario['password'] ?? '')) {
-                return null;
-            }
-
-            return [
-                'id' => $usuario['id'] ?? null,
-                'correo' => $usuario['correo'] ?? '',
-                'rol_id' => $usuario['rol_id'] ?? null,
-                'rol' => $usuario['rol'] ?? 'Estudiante'
-            ];
+        if (!$usuario) {
+            return null;
         }
 
-        return null;
-    }
-
-    private function inicializarUsuariosSiNoExiste(): void
-    {
-        if (file_exists($this->rutaUsuarios)) {
-            return;
+        // Verificar que el usuario esté activo
+        if ($usuario['estado'] !== 'activo') {
+            return null;
         }
 
-        $usuariosIniciales = [
-            [
-                'id' => 1,
-                'correo' => 'coordinador@ug.edu.ec',
-                'password' => password_hash('Coord123*', PASSWORD_DEFAULT),
-                'rol_id' => 1,
-                'rol' => 'Coordinador'
-            ],
-            [
-                'id' => 2,
-                'correo' => 'tutor@ug.edu.ec',
-                'password' => password_hash('Tutor123*', PASSWORD_DEFAULT),
-                'rol_id' => 2,
-                'rol' => 'Tutor'
-            ],
-            [
-                'id' => 3,
-                'correo' => 'estudiante@ug.edu.ec',
-                'password' => password_hash('Est12345*', PASSWORD_DEFAULT),
-                'rol_id' => 3,
-                'rol' => 'Estudiante'
-            ]
+        // Verificar contraseña con bcrypt
+        if (!password_verify($password, $usuario['password'])) {
+            return null;
+        }
+
+        // Retornar datos del usuario (sin la contraseña)
+        return [
+            'id'       => $usuario['id_usuario'],
+            'nombre'   => $usuario['nombre'],
+            'apellido' => $usuario['apellido'],
+            'correo'   => $usuario['correo'],
+            'rol_id'   => $usuario['rol_id'],
+            'rol'      => $usuario['rol']
         ];
-
-        file_put_contents(
-            $this->rutaUsuarios,
-            json_encode($usuariosIniciales, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT)
-        );
-    }
-
-    private function leerUsuarios(): array
-    {
-        $contenido = @file_get_contents($this->rutaUsuarios);
-        $usuarios = json_decode($contenido ?: '[]', true);
-
-        return is_array($usuarios) ? $usuarios : [];
     }
 }

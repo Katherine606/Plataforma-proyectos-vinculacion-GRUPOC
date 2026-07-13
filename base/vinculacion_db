@@ -1,0 +1,118 @@
+
+CREATE DATABASE IF NOT EXISTS vinculacion_db
+CHARACTER SET utf8mb4 --para soportar caracteres especiales y emojis
+COLLATE utf8mb4_unicode_ci; --para soportar caracteres especiales y emojis
+
+USE vinculacion_db;
+
+-- ============================================
+-- TABLA: roles
+-- ============================================
+CREATE TABLE roles (
+    id_rol INT PRIMARY KEY AUTO_INCREMENT,
+    nombre VARCHAR(50) NOT NULL
+);
+
+INSERT INTO roles (id_rol, nombre) VALUES
+(1, 'Coordinador'),
+(2, 'Tutor Academico'),
+(3, 'Estudiante');
+
+-- ============================================
+-- TABLA: usuarios
+-- ============================================
+CREATE TABLE usuarios (
+    id_usuario INT PRIMARY KEY AUTO_INCREMENT,
+    nombre VARCHAR(100) NOT NULL,
+    apellido VARCHAR(100) NOT NULL,
+    correo VARCHAR(150) UNIQUE NOT NULL,
+    password VARCHAR(255) NOT NULL,
+    rol_id INT NOT NULL,
+    estado VARCHAR(20) DEFAULT 'activo',
+    FOREIGN KEY (rol_id) REFERENCES roles(id_rol)
+);
+
+-- Usuarios de prueba (contraseñas hasheadas con bcrypt)
+-- coordinador@ug.edu.ec / Coord123*
+-- tutor@ug.edu.ec / Tutor123*
+-- estudiante@ug.edu.ec / Est12345*
+INSERT INTO usuarios (nombre, apellido, correo, password, rol_id, estado) VALUES
+('Carlos', 'Mendoza', 'coordinador@ug.edu.ec', '$2y$10$RVPD53pWTuJoTJ8wz192v.foxVvfne1hq5.Vpph6ViUCNP2zWTJAa', 1, 'activo'),
+('Laura', 'Torres', 'tutor@ug.edu.ec', '$2y$10$GPlfUkjjLQX2oOBrvoRbe.GpWnTUj/gQBVn3ofhxMOK4pE7U9VraO', 2, 'activo'),
+('Ana', 'Garcia', 'estudiante@ug.edu.ec', '$2y$10$zfS8wP7xyDMcOE8KkoiTHuMPyjzcpgdSqMxqm6YfkiAXcvdEdwxMC', 3, 'activo');
+
+-- ============================================
+-- TABLA: facultades
+-- ============================================
+CREATE TABLE facultades (
+    id_facultad INT PRIMARY KEY AUTO_INCREMENT,
+    nombre VARCHAR(150) NOT NULL
+);
+
+INSERT INTO facultades (nombre) VALUES
+('Facultad de Ingeniería'),
+('Facultad de Ciencias de la Salud'),
+('Facultad de Administración');
+
+-- ============================================
+-- TABLA: carreras
+-- ============================================
+CREATE TABLE carreras (
+    id_carrera INT PRIMARY KEY AUTO_INCREMENT,
+    facultad_id INT NOT NULL,
+    nombre VARCHAR(150) NOT NULL,
+    FOREIGN KEY (facultad_id) REFERENCES facultades(id_facultad)
+);
+
+INSERT INTO carreras (facultad_id, nombre) VALUES (1, 'Ingeniería en Sistemas'), (1, 'Ingeniería Civil'), (2, 'Medicina'), 
+(3, 'Administración de Empresas');
+
+-- ============================================
+-- TABLA: proyectos
+-- ============================================
+CREATE TABLE proyectos (
+    id_proyecto INT PRIMARY KEY AUTO_INCREMENT,
+    nombre VARCHAR(150) NOT NULL,
+    descripcion TEXT NOT NULL,
+    tutor_id INT NOT NULL,
+    facultad_id INT NOT NULL,
+    carrera_id INT NOT NULL,
+    cupos_max INT NOT NULL,
+    cupos_usados INT NOT NULL DEFAULT 0,
+    estado VARCHAR(20) DEFAULT 'activo',
+    fecha_inicio DATE NULL,
+    fecha_fin DATE NULL,
+    FOREIGN KEY (tutor_id) REFERENCES usuarios(id_usuario),
+    FOREIGN KEY (facultad_id) REFERENCES facultades(id_facultad),
+    FOREIGN KEY (carrera_id) REFERENCES carreras(id_carrera)
+);
+
+-- ============================================
+-- TABLA: solicitudes
+-- ============================================
+CREATE TABLE solicitudes (
+    id_solicitud INT PRIMARY KEY AUTO_INCREMENT,
+    estudiante_id INT NOT NULL,
+    proyecto_id INT NOT NULL,
+    estado VARCHAR(20) DEFAULT 'pendiente',
+    fecha_solicitud DATETIME NOT NULL,
+    FOREIGN KEY (estudiante_id) REFERENCES usuarios(id_usuario),
+    FOREIGN KEY (proyecto_id) REFERENCES proyectos(id_proyecto)
+);
+
+-- ============================================
+-- TABLA: horas_vinculacion
+-- ============================================
+CREATE TABLE horas_vinculacion (
+    id_hora INT PRIMARY KEY AUTO_INCREMENT,
+    estudiante_id INT NOT NULL,
+    proyecto_id INT NOT NULL,
+    tutor_id INT NOT NULL,
+    fecha_actividad DATE NOT NULL,
+    descripcion TEXT NOT NULL,
+    horas DECIMAL(5,2) NOT NULL,
+    estado VARCHAR(20) DEFAULT 'Pendiente',
+    FOREIGN KEY (estudiante_id) REFERENCES usuarios(id_usuario),
+    FOREIGN KEY (proyecto_id) REFERENCES proyectos(id_proyecto),
+    FOREIGN KEY (tutor_id) REFERENCES usuarios(id_usuario)
+);
