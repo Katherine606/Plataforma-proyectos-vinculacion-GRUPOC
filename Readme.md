@@ -135,11 +135,7 @@ Abrir en el navegador: http://localhost:4200
     Puerto:    3306
     Usuario:   root
     Contrasena: (vacia)
-    Base:      vinculacion_db
-
-  NOTA: Estas son las credenciales por defecto de XAMPP. Si cambiaste la
-  contrasena de root, edita el archivo backend/config/database.php.
-
+    Base:      vinculacion_d
 
 ## 7. EJECUTAR EL BACKEND
 
