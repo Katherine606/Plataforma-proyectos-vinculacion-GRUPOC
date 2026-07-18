@@ -153,7 +153,7 @@ export class FormularioProyectoComponent implements OnInit {
 
     this.proyectoService.crearProyecto(this.form.value).subscribe({
       next: () => {
-        this.router.navigate(['/editor']);
+        this.router.navigate(['/proyectos']);
       },
       error: (err: HttpErrorResponse) => {
         console.error('Error al crear proyecto:', err);

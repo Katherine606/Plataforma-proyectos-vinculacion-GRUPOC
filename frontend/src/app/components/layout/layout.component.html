@@ -12,18 +12,29 @@
     </div>
 
     <nav class="menu">
-      <!-- routerLinkActive marca el botón activo automáticamente -->
-      <a routerLink="/"            routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
-        Lista de proyectos
+      <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
+        Dashboard
+      </a>
+      <a routerLink="/proyectos" routerLinkActive="active">
+        Proyectos
       </a>
       <a *ngIf="canManageProjects" routerLink="/nuevo" routerLinkActive="active">
         Nuevo proyecto
       </a>
-      <a *ngIf="canManageProjects" routerLink="/editor" routerLinkActive="active">
-        Editor de proyectos
+      <a *ngIf="canManageStudents" routerLink="/crear-actividad" routerLinkActive="active">
+        Crear actividad
       </a>
-      <a *ngIf="canManageStudents" routerLink="/solicitudes" routerLinkActive="active">
+      <a *ngIf="canManageStudents || canManageProjects" routerLink="/solicitudes" routerLinkActive="active">
         Solicitudes
+      </a>
+      <a *ngIf="isEstudiante" routerLink="/registro-horas" routerLinkActive="active">
+        Registrar horas
+      </a>
+      <a *ngIf="isEstudiante" routerLink="/mis-horas" routerLinkActive="active">
+        Mis horas
+      </a>
+      <a *ngIf="canManageStudents" routerLink="/aprobacion-horas" routerLinkActive="active">
+        Aprobar horas
       </a>
     </nav>
 

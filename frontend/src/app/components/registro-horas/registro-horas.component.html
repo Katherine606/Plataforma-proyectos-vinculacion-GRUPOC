@@ -1,0 +1,44 @@
+<h1>Registrar Horas de Vinculación</h1>
+
+<div *ngIf="exitoMsg" class="alert-success">
+  {{ exitoMsg }}
+</div>
+
+<div *ngIf="errorMsg" class="alert-error">
+  {{ errorMsg }}
+</div>
+
+<div *ngIf="actividades.length === 0 && !errorMsg" class="empty-state">
+  No hay actividades disponibles. Tu tutor debe crear una actividad primero.
+</div>
+
+<form *ngIf="actividades.length > 0" [formGroup]="form" (ngSubmit)="onSubmit()">
+
+  <div class="form-group">
+    <label for="id_actividad">Actividad del día</label>
+    <select id="id_actividad" formControlName="id_actividad" (change)="onActividadChange()">
+      <option [ngValue]="null">-- Seleccionar actividad --</option>
+      <option *ngFor="let a of actividades" [ngValue]="a.id">
+        {{ a.fecha }} — {{ a.nombre_proyecto }} — {{ a.descripcion }}
+      </option>
+    </select>
+    <span class="error-msg" *ngIf="form.get('id_actividad')?.touched && form.get('id_actividad')?.errors?.['required']">
+      Selecciona una actividad.
+    </span>
+  </div>
+
+  <div class="form-group">
+    <label for="horas">Horas trabajadas (máx. 8 por día)</label>
+    <input type="number" id="horas" formControlName="horas" min="1" max="8" step="0.5">
+    <span class="error-msg" *ngIf="form.get('horas')?.touched && form.get('horas')?.errors">
+      Ingresa entre 1 y 8 horas.
+    </span>
+  </div>
+
+  <div class="form-actions">
+    <button type="submit" class="btn" [disabled]="enviando">
+      {{ enviando ? 'Registrando...' : 'Registrar Horas' }}
+    </button>
+  </div>
+
+</form>

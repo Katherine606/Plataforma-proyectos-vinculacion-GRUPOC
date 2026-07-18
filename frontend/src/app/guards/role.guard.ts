@@ -12,7 +12,7 @@ export class RoleGuard implements CanActivate {
     const rolesPermitidos = (route.data['roles'] as string[]) ?? [];
     const rolActual = this.authService.getRole();
 
-    if (rolActual && rolesPermitidos.includes(rolActual)) {
+    if (rolActual && rolesPermitidos.some(r => rolActual.toLowerCase().includes(r.toLowerCase()))) {
       return true;
     }
 

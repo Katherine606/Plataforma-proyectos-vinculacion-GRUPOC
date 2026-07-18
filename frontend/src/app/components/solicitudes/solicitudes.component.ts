@@ -28,7 +28,8 @@ export class SolicitudesComponent implements OnInit {
 
   ngOnInit(): void {
     this.rol = this.authService.getRole() ?? '';
-    this.canManageSolicitudes = this.rol === 'Tutor';
+    const rolLower = this.rol.toLowerCase();
+    this.canManageSolicitudes = rolLower.includes('tutor') || rolLower.includes('coordinador');
     this.cargar();
   }
 
@@ -84,8 +85,8 @@ export class SolicitudesComponent implements OnInit {
 
     return Array.from(mapa.entries())
       .map(([idProyecto, data]) => {
-        const totalAceptadas = data.solicitudes.filter(s => s.estado === 'aceptado').length;
-        const totalDenegadas = data.solicitudes.filter(s => s.estado === 'denegado').length;
+        const totalAceptadas = data.solicitudes.filter(s => s.estado === 'aceptada').length;
+        const totalDenegadas = data.solicitudes.filter(s => s.estado === 'denegada').length;
 
         return {
           idProyecto,
@@ -106,7 +107,7 @@ export class SolicitudesComponent implements OnInit {
     const mapa = new Map<number, { nombreProyecto: string; estudiantes: string[] }>();
 
     for (const solicitud of this.solicitudes) {
-      if (solicitud.estado !== 'aceptado') {
+      if (solicitud.estado !== 'aceptada') {
         continue;
       }
 
@@ -163,7 +164,7 @@ export class SolicitudesComponent implements OnInit {
   }
 
   resetearSolicitudes(): void {
-    if (this.rol !== 'Coordinador') {
+    if (!this.rol.toLowerCase().includes('coordinador')) {
       return;
     }
 

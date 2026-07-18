@@ -1,0 +1,112 @@
+<h1>Dashboard</h1>
+
+<p *ngIf="cargando" style="color:#94a3b8;">Cargando datos...</p>
+
+<div *ngIf="errorMsg" class="alert-error">
+  {{ errorMsg }}
+</div>
+
+<!-- ═══ DASHBOARD DEL COORDINADOR ═══ -->
+<div *ngIf="!cargando && rol.includes('coordinador') && datos" class="stats-row">
+  <div class="stat-card">
+    <span class="stat-icon">📁</span>
+    <div>
+      <small>Proyectos Activos</small>
+      <strong>{{ datos.total_proyectos }}</strong>
+    </div>
+  </div>
+  <div class="stat-card">
+    <span class="stat-icon">👥</span>
+    <div>
+      <small>Total Estudiantes</small>
+      <strong>{{ datos.total_estudiantes }}</strong>
+    </div>
+  </div>
+  <div class="stat-card">
+    <span class="stat-icon">📨</span>
+    <div>
+      <small>Solicitudes Pendientes</small>
+      <strong>{{ datos.solicitudes_pendientes }}</strong>
+    </div>
+  </div>
+  <div class="stat-card">
+    <span class="stat-icon">✅</span>
+    <div>
+      <small>Solicitudes Aceptadas</small>
+      <strong>{{ datos.solicitudes_aceptadas }}</strong>
+    </div>
+  </div>
+  <div class="stat-card">
+    <span class="stat-icon">⏱️</span>
+    <div>
+      <small>Horas Aprobadas</small>
+      <strong>{{ datos.total_horas_aprobadas }}</strong>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ DASHBOARD DEL TUTOR ═══ -->
+<div *ngIf="!cargando && rol.includes('tutor') && datos" class="stats-row">
+  <div class="stat-card">
+    <span class="stat-icon">📁</span>
+    <div>
+      <small>Proyectos Asignados</small>
+      <strong>{{ datos.proyectos_asignados }}</strong>
+    </div>
+  </div>
+  <div class="stat-card">
+    <span class="stat-icon">👥</span>
+    <div>
+      <small>Estudiantes a cargo</small>
+      <strong>{{ datos.estudiantes_asignados }}</strong>
+    </div>
+  </div>
+  <div class="stat-card">
+    <span class="stat-icon">⏳</span>
+    <div>
+      <small>Horas Pendientes</small>
+      <strong>{{ datos.horas_pendientes }}</strong>
+    </div>
+  </div>
+  <div class="stat-card">
+    <span class="stat-icon">✅</span>
+    <div>
+      <small>Horas Aprobadas</small>
+      <strong>{{ datos.horas_aprobadas }}</strong>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ DASHBOARD DEL ESTUDIANTE ═══ -->
+<div *ngIf="!cargando && rol.includes('estudiante') && datos" class="stats-row">
+  <div class="stat-card">
+    <span class="stat-icon">✅</span>
+    <div>
+      <small>Horas Aprobadas</small>
+      <strong>{{ datos.horas_aprobadas }}</strong>
+    </div>
+  </div>
+  <div class="stat-card">
+    <span class="stat-icon">⏳</span>
+    <div>
+      <small>Horas Pendientes</small>
+      <strong>{{ datos.horas_pendientes }}</strong>
+    </div>
+  </div>
+  <div class="stat-card">
+    <span class="stat-icon">📨</span>
+    <div>
+      <small>Total Solicitudes</small>
+      <strong>{{ datos.total_solicitudes }}</strong>
+    </div>
+  </div>
+  <div class="stat-card">
+    <span class="stat-icon">🎉</span>
+    <div>
+      <small>Solicitudes Aceptadas</small>
+      <strong>{{ datos.solicitudes_aceptadas }}</strong>
+    </div>
+  </div>
+</div>
+
+<p *ngIf="!cargando && !datos" class="empty-state">No hay datos disponibles.</p>

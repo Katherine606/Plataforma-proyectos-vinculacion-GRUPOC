@@ -1,52 +1,111 @@
-<h1>Lista de Proyectos</h1>
-
-<!-- Botón que navega al formulario de creación -->
-<a *ngIf="canManageProjects" routerLink="/nuevo" class="btn">Nuevo Proyecto</a>
-
-<!-- Mensaje de error si falla la conexión a PHP -->
-<div *ngIf="error" style="color:#dc2626; background:#fee; padding:15px; border-radius:8px; margin-bottom:15px;">
-  {{ error }}
+<div class="crud-header">
+  <h1>Proyectos</h1>
+  <a *ngIf="isCoordinador" routerLink="/nuevo" class="btn">+ Nuevo Proyecto</a>
 </div>
 
-<!-- Indicador de carga -->
-<div *ngIf="cargando" style="color:#888; padding:20px;">
-  Cargando proyectos...
-</div>
+<div *ngIf="error" class="alert-error">{{ error }}</div>
+<div *ngIf="mensajeExito" class="alert-success">{{ mensajeExito }}</div>
+
+<div *ngIf="cargando" class="empty-state">Cargando proyectos...</div>
 
 <table *ngIf="!cargando && !error">
   <thead>
     <tr>
-      <th>ID</th>
       <th>Proyecto</th>
-      <th>Descripción</th>
       <th>Tutor</th>
       <th>Facultad</th>
       <th>Carrera</th>
       <th>Cupos</th>
-      <th>Acciones</th>
+      <th *ngIf="isCoordinador" style="width:140px;">Acciones</th>
+      <th *ngIf="isEstudiante" style="width:120px;">Acción</th>
     </tr>
   </thead>
   <tbody>
     <tr *ngIf="proyectos.length === 0">
-      <td colspan="7" style="text-align:center; color:#888;">
-        No hay proyectos registrados aún.
+      <td [attr.colspan]="isCoordinador ? 6 : (isEstudiante ? 6 : 5)" style="text-align:center; color:#94a3b8; padding:32px;">
+        No hay proyectos registrados.
       </td>
     </tr>
     <tr *ngFor="let p of proyectos">
-      <td>{{ p.id }}</td>
-      <td>{{ p.nombre }}</td>
-      <td>{{ p.descripcion }}</td>
+      <td>
+        <strong>{{ p.nombre }}</strong>
+        <div *ngIf="p.descripcion" style="font-size:12px; color:#94a3b8; margin-top:2px; max-width:250px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
+          {{ p.descripcion }}
+        </div>
+      </td>
       <td>{{ p.tutor }}</td>
       <td>{{ p.facultad }}</td>
       <td>{{ p.carrera }}</td>
-      <td>{{ p.cupos_usados }}/{{ p.cupos_max }}</td>
       <td>
-        <button *ngIf="rol === 'Estudiante' && p.cupos_usados < p.cupos_max" (click)="inscribirse(p)">
+        <span class="cupos-badge" [class.cupos-lleno]="p.cupos_usados >= p.cupos_max">
+          {{ p.cupos_usados }}/{{ p.cupos_max }}
+        </span>
+      </td>
+      <td *ngIf="isCoordinador" class="acciones-cell">
+        <button class="btn-icon btn-edit" title="Editar" (click)="abrirEditor(p)">&#9998;</button>
+        <button class="btn-icon btn-delete" title="Eliminar" (click)="confirmarEliminar(p)">&#10005;</button>
+      </td>
+      <td *ngIf="isEstudiante">
+        <button class="btn btn-aceptar" *ngIf="p.cupos_usados < p.cupos_max"
+                style="padding:6px 14px; font-size:12px;" (click)="inscribirse(p)">
           Inscribirse
         </button>
+        <span *ngIf="p.cupos_usados >= p.cupos_max" style="font-size:12px; color:#94a3b8;">Lleno</span>
       </td>
     </tr>
   </tbody>
 </table>
 
-<div *ngIf="mensajeExito" style="color:green; margin-top:10px;">{{ mensajeExito }}</div>
+<!-- MODAL DE EDICION -->
+<div *ngIf="modalAbierto && proyectoEditando" class="modal-overlay" (click)="cerrarModal()">
+  <div class="modal-box" (click)="$event.stopPropagation()">
+
+    <button class="modal-cerrar-x" (click)="cerrarModal()">&#10005;</button>
+
+    <h2>Editar Proyecto</h2>
+
+    <div class="modal-stats">
+      <div class="stat-card">
+        <span class="stat-icon">&#128100;</span>
+        <div>
+          <small>Inscritos</small>
+          <strong>{{ proyectoEditando.cupos_usados }}</strong>
+        </div>
+      </div>
+      <div class="stat-card">
+        <span class="stat-icon">&#128197;</span>
+        <div>
+          <small>Cupos restantes</small>
+          <strong>{{ proyectoEditando.cupos_max - proyectoEditando.cupos_usados }}</strong>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>Nombre</label>
+      <input type="text" [(ngModel)]="editNombre">
+    </div>
+
+    <div class="form-group">
+      <label>Descripci&oacute;n</label>
+      <textarea [(ngModel)]="editDescripcion" rows="3"></textarea>
+    </div>
+
+    <div class="form-group">
+      <label>Tutor</label>
+      <select [(ngModel)]="editTutorId" [disabled]="editTutorBloqueado">
+        <option [ngValue]="null">-- Seleccionar --</option>
+        <option *ngFor="let t of tutores" [ngValue]="t.id">{{ t.nombre }} {{ t.apellido }}</option>
+      </select>
+      <button type="button" class="btn-link" (click)="habilitarTutor()" *ngIf="editTutorBloqueado">
+        Cambiar tutor
+      </button>
+    </div>
+
+    <div class="form-actions">
+      <button class="btn" (click)="guardarCambios()">Guardar</button>
+      <button class="btn btn-secondary" (click)="cerrarModal()">Cancelar</button>
+    </div>
+
+  </div>
+</div>

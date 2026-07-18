@@ -54,14 +54,14 @@ export class LoginComponent {
   }
 
   private redirigirSegunRol(): void {
-    const rol = this.authService.getRole();
+    const rol = (this.authService.getRole() ?? '').toLowerCase();
 
-    if (rol === 'Coordinador') {
+    if (rol.includes('coordinador')) {
       this.router.navigate(['/']);
       return;
     }
 
-    if (rol === 'Tutor') {
+    if (rol.includes('tutor')) {
       this.router.navigate(['/solicitudes']);
       return;
     }

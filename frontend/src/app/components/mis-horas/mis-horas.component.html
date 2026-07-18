@@ -1,0 +1,67 @@
+<h1>Mis Horas de Vinculación</h1>
+
+<div *ngIf="errorMsg" style="color:#dc2626; background:#fee; padding:12px; border-radius:8px; margin-bottom:15px;">
+  {{ errorMsg }}
+</div>
+
+<!-- Tarjetas de resumen -->
+<div class="stats-row" *ngIf="resumen">
+  <div class="stat-card">
+    <span class="stat-icon">✅</span>
+    <div>
+      <small>Horas Aprobadas</small>
+      <strong>{{ resumen.horas_aprobadas }}</strong>
+    </div>
+  </div>
+  <div class="stat-card">
+    <span class="stat-icon">⏳</span>
+    <div>
+      <small>Horas Pendientes</small>
+      <strong>{{ resumen.horas_pendientes }}</strong>
+    </div>
+  </div>
+  <div class="stat-card">
+    <span class="stat-icon">❌</span>
+    <div>
+      <small>Horas Rechazadas</small>
+      <strong>{{ resumen.horas_rechazadas }}</strong>
+    </div>
+  </div>
+  <div class="stat-card">
+    <span class="stat-icon">📋</span>
+    <div>
+      <small>Total Registros</small>
+      <strong>{{ resumen.totalregistros }}</strong>
+    </div>
+  </div>
+</div>
+
+<p *ngIf="cargando" style="color:#888; margin-top:20px;">Cargando datos...</p>
+
+<!-- Tabla de historial -->
+<table *ngIf="!cargando && horas.length > 0" style="margin-top:20px;">
+  <thead>
+    <tr>
+      <th>Fecha</th>
+      <th>Proyecto</th>
+      <th>Descripción</th>
+      <th>Horas</th>
+      <th>Estado</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let h of horas">
+      <td>{{ h.fecha_actividad }}</td>
+      <td>{{ h.proyecto }}</td>
+      <td>{{ h.descripcion }}</td>
+      <td>{{ h.horas }}</td>
+      <td>
+        <span class="badge" [ngClass]="badgeClass(h.estado)">{{ h.estado }}</span>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<p *ngIf="!cargando && horas.length === 0" style="color:#888; margin-top:20px;">
+  No tienes registros de horas aún.
+</p>

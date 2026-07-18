@@ -1,0 +1,80 @@
+<h1>Aprobación de Horas</h1>
+
+<div *ngIf="exitoMsg" class="alert-success">
+  {{ exitoMsg }}
+</div>
+
+<div *ngIf="errorMsg" class="alert-error">
+  {{ errorMsg }}
+</div>
+
+<p *ngIf="cargando" style="color:#94a3b8;">Cargando registros...</p>
+
+<!-- Horas pendientes -->
+<h2 *ngIf="!cargando && horasPendientes.length > 0" class="section-title">
+  Pendientes de revisión ({{ horasPendientes.length }})
+</h2>
+
+<table *ngIf="!cargando && horasPendientes.length > 0">
+  <thead>
+    <tr>
+      <th>Estudiante</th>
+      <th>Proyecto</th>
+      <th>Fecha</th>
+      <th>Descripción</th>
+      <th>Horas</th>
+      <th>Acciones</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let h of horasPendientes">
+      <td>{{ h.estudiante }}</td>
+      <td>{{ h.proyecto }}</td>
+      <td>{{ h.fecha_actividad }}</td>
+      <td>{{ h.descripcion }}</td>
+      <td><strong>{{ h.horas }}</strong></td>
+      <td>
+        <div class="solicitud-acciones">
+          <button class="btn btn-aceptar" (click)="aprobar(h.id)">Aprobar</button>
+          <button class="btn btn-denegar" (click)="rechazar(h.id)">Rechazar</button>
+        </div>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<div *ngIf="!cargando && horasPendientes.length === 0" class="empty-state">
+  No hay registros pendientes de revisión.
+</div>
+
+<!-- Horas procesadas -->
+<h2 *ngIf="!cargando && horasProcesadas.length > 0" class="section-title">
+  Historial procesado
+</h2>
+
+<table *ngIf="!cargando && horasProcesadas.length > 0">
+  <thead>
+    <tr>
+      <th>Estudiante</th>
+      <th>Proyecto</th>
+      <th>Fecha</th>
+      <th>Descripción</th>
+      <th>Horas</th>
+      <th>Estado</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let h of horasProcesadas">
+      <td>{{ h.estudiante }}</td>
+      <td>{{ h.proyecto }}</td>
+      <td>{{ h.fecha_actividad }}</td>
+      <td>{{ h.descripcion }}</td>
+      <td><strong>{{ h.horas }}</strong></td>
+      <td>
+        <span class="badge" [ngClass]="h.estado === 'aprobada' ? 'badge-aceptado' : 'badge-denegado'">
+          {{ h.estado }}
+        </span>
+      </td>
+    </tr>
+  </tbody>
+</table>

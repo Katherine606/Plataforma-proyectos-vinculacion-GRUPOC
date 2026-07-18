@@ -1,0 +1,70 @@
+<h1>Crear Actividad del Día</h1>
+
+<div *ngIf="exitoMsg" class="alert-success">
+  {{ exitoMsg }}
+</div>
+
+<div *ngIf="errorMsg" class="alert-error">
+  {{ errorMsg }}
+</div>
+
+<form [formGroup]="form" (ngSubmit)="onSubmit()">
+
+  <div class="form-group">
+    <label for="proyecto_id">Proyecto</label>
+    <select id="proyecto_id" formControlName="proyecto_id">
+      <option [ngValue]="null">-- Seleccionar proyecto --</option>
+      <option *ngFor="let p of proyectos" [ngValue]="p.id">{{ p.nombre }}</option>
+    </select>
+    <span class="error-msg" *ngIf="form.get('proyecto_id')?.touched && form.get('proyecto_id')?.errors?.['required']">
+      Selecciona un proyecto.
+    </span>
+  </div>
+
+  <div class="form-group">
+    <label for="fecha">Fecha de la actividad</label>
+    <input type="date" id="fecha" formControlName="fecha" [max]="hoy()">
+    <span class="error-msg" *ngIf="form.get('fecha')?.touched && form.get('fecha')?.errors?.['required']">
+      La fecha es obligatoria.
+    </span>
+  </div>
+
+  <div class="form-group">
+    <label for="descripcion">Descripción de la actividad</label>
+    <textarea id="descripcion" formControlName="descripcion" rows="4"
+              placeholder="Describe la actividad que se realizará..."></textarea>
+    <span class="error-msg" *ngIf="form.get('descripcion')?.touched && form.get('descripcion')?.errors?.['minlength']">
+      Mínimo 5 caracteres.
+    </span>
+  </div>
+
+  <div class="form-actions">
+    <button type="submit" class="btn" [disabled]="enviando">
+      {{ enviando ? 'Creando...' : 'Crear Actividad' }}
+    </button>
+  </div>
+
+</form>
+
+<h2 *ngIf="actividades.length > 0" class="section-title">Actividades creadas</h2>
+
+<table *ngIf="actividades.length > 0">
+  <thead>
+    <tr>
+      <th>Fecha</th>
+      <th>Proyecto</th>
+      <th>Descripción</th>
+      <th>Acciones</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let a of actividades">
+      <td>{{ a.fecha }}</td>
+      <td>{{ a.nombre_proyecto }}</td>
+      <td>{{ a.descripcion }}</td>
+      <td>
+        <button class="btn btn-denegar" style="padding:6px 12px; font-size:12px;" (click)="eliminar(a.id)">Eliminar</button>
+      </td>
+    </tr>
+  </tbody>
+</table>

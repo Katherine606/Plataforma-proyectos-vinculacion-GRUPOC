@@ -37,6 +37,8 @@ class AuthController
         $token = $this->jwtHelper->generarToken([
             'sub' => $usuario['id'],
             'correo' => $usuario['correo'],
+            'nombre' => $usuario['nombre'],
+            'apellido' => $usuario['apellido'],
             'rol_id' => $usuario['rol_id'],
             'rol' => $usuario['rol']
         ]);

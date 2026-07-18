@@ -17,5 +17,5 @@ export interface Solicitud {
   estudiante: string;
   id_proyecto: number;
   nombre_proyecto: string;
-  estado: 'pendiente' | 'aceptado' | 'denegado';
+  estado: 'pendiente' | 'aceptada' | 'denegada';
 }
