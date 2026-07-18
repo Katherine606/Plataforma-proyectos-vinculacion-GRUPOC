@@ -1,0 +1,403 @@
+================================================================================
+ PLAN DE PRUEBAS COMPLETO - Plataforma de Gestion de Proyectos de Vinculacion
+ Grupo C - Construccion de Software
+================================================================================
+
+Este documento contiene todos los casos de prueba del sistema, organizados
+por modulo funcional. Cada caso incluye: codigo, descripcion, pasos,
+resultado esperado, resultado obtenido y estado.
+
+
+================================================================================
+MODULO 1: AUTENTICACION
+================================================================================
+
+CP-001: Login exitoso como Coordinador
+  Credenciales: coordinador@ug.edu.ec / Coord123*
+  Pasos: Ingresar credenciales > clic "Iniciar Sesion"
+  Resultado esperado: Redirige al dashboard del Coordinador.
+  Estado: Exitoso
+
+CP-002: Login exitoso como Tutor
+  Credenciales: tutor@ug.edu.ec / Tutor123*
+  Pasos: Ingresar credenciales > clic "Iniciar Sesion"
+  Resultado esperado: Redirige al dashboard del Tutor.
+  Estado: Exitoso
+
+CP-003: Login exitoso como Estudiante
+  Credenciales: estudiante@ug.edu.ec / Est12345*
+  Pasos: Ingresar credenciales > clic "Iniciar Sesion"
+  Resultado esperado: Redirige al dashboard del Estudiante.
+  Estado: Exitoso
+
+CP-004: Contrasena incorrecta
+  Credenciales: coordinador@ug.edu.ec / incorrecta123
+  Pasos: Ingresar credenciales > clic "Iniciar Sesion"
+  Resultado esperado: Mensaje "Credenciales invalidas".
+  Estado: Exitoso
+
+CP-005: Correo inexistente
+  Credenciales: noexiste@ug.edu.ec / cualquier123
+  Pasos: Ingresar credenciales > clic "Iniciar Sesion"
+  Resultado esperado: Mensaje "Credenciales invalidas" (no revela si existe).
+  Estado: Exitoso
+
+CP-006: Campos vacios
+  Credenciales: (vacio) / (vacio)
+  Pasos: Dejar campos vacios > clic "Iniciar Sesion"
+  Resultado esperado: Mensaje "Email y password son obligatorios".
+  Estado: Exitoso
+
+CP-007: Usuario inactivo
+  Preparacion: UPDATE usuarios SET estado='inactivo' WHERE id_usuario=1
+  Credenciales: coordinador@ug.edu.ec / Coord123*
+  Pasos: Ingresar credenciales > clic "Iniciar Sesion"
+  Resultado esperado: Mensaje "Credenciales invalidas".
+  Estado: Exitoso
+
+CP-008: Token JWT expirado
+  Preparacion: Usar un token con fecha exp pasada.
+  Pasos: Intentar acceder a GET ?recurso=proyectos con token expirado.
+  Resultado esperado: HTTP 403 "Token invalido o expirado".
+  Estado: Exitoso
+
+CP-009: Ruta protegida sin token
+  Pasos: Abrir navegador > ir a http://localhost:8000/index.php?recurso=proyectos
+  Resultado esperado: HTTP 403 "Token no enviado".
+  Estado: Exitoso
+
+CP-010: Estudiante accede a ruta de Coordinador
+  Pasos: Login como Estudiante > intentar navegar a /usuarios
+  Resultado esperado: RoleGuard redirige al dashboard.
+  Estado: Exitoso
+
+
+================================================================================
+MODULO 2: GESTION DE PROYECTOS
+================================================================================
+
+CP-011: Crear proyecto exitoso (Coordinador)
+  Pasos: Login Coordinador > "Nuevo Proyecto" > llenar formulario > "Guardar"
+  Datos: Nombre="Proyecto Test", Descripcion="Desc test", Facultad=1,
+         Carrera=1, Tutor=2, Cupos=15
+  Resultado esperado: Proyecto creado, redirige a lista.
+  Estado: Exitoso
+
+CP-012: Validar campos obligatorios al crear proyecto
+  Pasos: Login Coordinador > "Nuevo Proyecto" > dejar campos vacios > "Guardar"
+  Resultado esperado: Errores de validacion en cada campo requerido.
+  Estado: Exitoso
+
+CP-013: Cupos maximos (60)
+  Pasos: Login Coordinador > crear proyecto con cupos = 100
+  Resultado esperado: Backend limita a 60 automaticamente.
+  Estado: Exitoso
+
+CP-014: Tutor invalido
+  Pasos: Enviar POST con tutor_id = 999 (no existe)
+  Resultado esperado: HTTP 400 "El tutor seleccionado no es valido".
+  Estado: Exitoso
+
+CP-015: Editar proyecto (Coordinador)
+  Pasos: Login Coordinador > clic editar en proyecto > modificar nombre > "Guardar"
+  Resultado esperado: Proyecto actualizado en la BD.
+  Estado: Exitoso
+
+CP-016: Eliminar proyecto (Coordinador)
+  Pasos: Login Coordinador > clic eliminar > confirmar
+  Resultado esperado: Proyecto eliminado de la BD.
+  Estado: Exitoso
+
+CP-017: Estudiante no puede crear proyecto
+  Pasos: Login Estudiante > intentar navegar a /nuevo
+  Resultado esperado: RoleGuard redirige al dashboard.
+  Estado: Exitoso
+
+CP-018: Tutor no puede crear proyecto
+  Pasos: Login Tutor > intentar navegar a /nuevo
+  Resultado esperado: RoleGuard redirige al dashboard.
+  Estado: Exitoso
+
+CP-019: Verificar datos de MySQL en la lista
+  Pasos: Login cualquier rol > ir a "Proyectos"
+  Resultado esperado: Se muestran los proyectos con tutor, facultad y carrera.
+  Estado: Exitoso
+
+CP-020: Busqueda de proyectos
+  Pasos: Login cualquier rol > escribir texto en barra de busqueda
+  Resultado esperado: Lista se filtra en tiempo real.
+  Estado: Exitoso
+
+CP-021: Paginacion de proyectos
+  Pasos: Login cualquier rol > tener mas de 8 proyectos > navegar paginas
+  Resultado esperado: Se muestran 8 por pagina con botones de navegacion.
+  Estado: Exitoso
+
+CP-022: Ver detalle de proyecto
+  Pasos: Login cualquier rol > clic en boton de detalle
+  Resultado esperado: Panel expandible con info completa y estudiantes.
+  Estado: Exitoso
+
+
+================================================================================
+MODULO 3: INSCRIPCION DE ESTUDIANTES
+================================================================================
+
+CP-023: Inscripcion exitosa
+  Pasos: Login Estudiante > ir a "Proyectos" > clic "Inscribirse"
+  Resultado esperado: Solicitud creada con estado "pendiente".
+  Estado: Exitoso
+
+CP-024: Sin cupos disponibles
+  Preparacion: Proyecto con cupos_usados >= cupos_max
+  Pasos: Login Estudiante > intentar inscribirse a proyecto lleno
+  Resultado esperado: Mensaje "No hay cupos disponibles".
+  Estado: Exitoso
+
+CP-025: Duplicada (misma solicitud pendiente)
+  Preparacion: Estudiante ya tiene solicitud pendiente para ese proyecto
+  Pasos: Login Estudiante > intentar inscribirse de nuevo
+  Resultado esperado: Mensaje "Ya existe una solicitud abierta".
+  Estado: Exitoso
+
+CP-026: Un proyecto por estudiante
+  Preparacion: Estudiante ya tiene solicitud aceptada en otro proyecto
+  Pasos: Login Estudiante > intentar inscribirse a otro proyecto
+  Resultado esperado: Mensaje "Ya estas inscrito en un proyecto".
+  Estado: Exitoso
+
+CP-027: Ver mis solicitudes (Estudiante)
+  Pasos: Login Estudiante > ir a "Mis solicitudes"
+  Resultado esperado: Se muestran solicitudes agrupadas (pendiente/aceptada/denegada).
+  Estado: Exitoso
+
+
+================================================================================
+MODULO 4: SOLICITUDES (TUTOR/COORDINADOR)
+================================================================================
+
+CP-028: Aceptar solicitud (Tutor)
+  Pasos: Login Tutor > "Solicitudes" > clic "Aceptar"
+  Resultado esperado: Solicitud cambia a "aceptada", cupos +1.
+  Estado: Exitoso
+
+CP-029: Denegar solicitud (Tutor)
+  Pasos: Login Tutor > "Solicitudes" > clic "Denegar"
+  Resultado esperado: Solicitud cambia a "denegada", cupos sin cambios.
+  Estado: Exitoso
+
+CP-030: Tutor solo ve solicitudes de sus proyectos
+  Pasos: Login Tutor > ir a "Solicitudes"
+  Resultado esperado: Solo aparecen solicitudes de proyectos asignados al tutor.
+  Estado: Exitoso
+
+CP-031: Coordinador ve todas las solicitudes
+  Pasos: Login Coordinador > ir a "Solicitudes"
+  Resultado esperado: Aparecen todas las solicitudes de todos los proyectos.
+  Estado: Exitoso
+
+CP-032: Busqueda de solicitudes
+  Pasos: Login Tutor/Coordinador > escribir en barra de busqueda
+  Resultado esperado: Lista filtrada por estudiante, proyecto o estado.
+  Estado: Exitoso
+
+
+================================================================================
+MODULO 5: ACTIVIDADES
+================================================================================
+
+CP-033: Crear actividad (Tutor)
+  Pasos: Login Tutor > "Crear Actividad" > seleccionar proyecto > llenar formulario
+  Datos: Titulo="Reunion de planificacion", Fecha=2026-07-15,
+         Descripcion="Reunion inicial del proyecto"
+  Resultado esperado: Actividad creada y visible en la lista.
+  Estado: Exitoso
+
+CP-034: Validar campos obligatorios de actividad
+  Pasos: Login Tutor > dejar campos vacios > "Crear Actividad"
+  Resultado esperado: Mensajes de error en cada campo requerido.
+  Estado: Exitoso
+
+CP-035: Tutor solo ve sus proyectos en el dropdown
+  Pasos: Login Tutor > ir a "Crear Actividad" > abrir dropdown de proyectos
+  Resultado esperado: Solo aparecen proyectos asignados al tutor logueado.
+  Estado: Exitoso
+
+CP-036: Eliminar actividad (Tutor)
+  Pasos: Login Tutor > clic eliminar en actividad > confirmar
+  Resultado esperado: Actividad eliminada de la BD.
+  Estado: Exitoso
+
+CP-037: Ver detalle de actividad (estudiantes)
+  Pasos: Login Tutor > clic en actividad para expandir
+  Resultado esperado: Tabla con estudiantes que registraron horas.
+  Estado: Exitoso
+
+
+================================================================================
+MODULO 6: HORAS DE VINCULACION
+================================================================================
+
+CP-038: Registrar horas (Estudiante)
+  Pasos: Login Estudiante > "Registrar Horas" > seleccionar actividad > horas=4
+  Resultado esperado: Registro creado con estado "pendiente".
+  Estado: Exitoso
+
+CP-039: Horas mayores a 8
+  Pasos: Login Estudiante > intentar registrar 10 horas
+  Resultado esperado: Validacion frontend bloquea (max=8).
+  Estado: Exitoso
+
+CP-040: Aprobar horas (Tutor)
+  Pasos: Login Tutor > "Aprobar Horas" > clic "Aprobar"
+  Resultado esperado: Registro cambia a estado "aprobada".
+  Estado: Exitoso
+
+CP-041: Rechazar horas (Tutor)
+  Pasos: Login Tutor > "Aprobar Horas" > clic "Rechazar"
+  Resultado esperado: Registro cambia a estado "rechazada".
+  Estado: Exitoso
+
+CP-042: Ver resumen de horas (Estudiante)
+  Pasos: Login Estudiante > ir a "Mis Horas"
+  Resultado esperado: Se muestran tarjetas de resumen (aprobadas/pendientes/rechazadas).
+  Estado: Exitoso
+
+CP-043: Busqueda de horas en aprobacion
+  Pasos: Login Tutor > escribir en barra de busqueda
+  Resultado esperado: Lista filtrada por estudiante, proyecto o descripcion.
+  Estado: Exitoso
+
+
+================================================================================
+MODULO 7: GESTION DE USUARIOS
+================================================================================
+
+CP-044: Crear usuario (Coordinador)
+  Pasos: Login Coordinador > "Usuarios" > "+ Nuevo Usuario" > llenar formulario
+  Datos: Nombre="Pedro", Apellido="Lopez", Correo="pedro@ug.edu.ec",
+         Password="Test123*", Rol=Estudiante
+  Resultado esperado: Usuario creado y visible en la tabla.
+  Estado: Exitoso
+
+CP-045: Editar usuario (Coordinador)
+  Pasos: Login Coordinador > clic editar > modificar nombre > "Actualizar"
+  Resultado esperado: Usuario actualizado en la BD.
+  Estado: Exitoso
+
+CP-046: Activar/Desactivar usuario
+  Pasos: Login Coordinador > clic toggle estado
+  Resultado esperado: Estado cambia entre activo/inactivo.
+  Estado: Exitoso
+
+CP-047: Eliminar usuario
+  Pasos: Login Coordinador > clic eliminar > confirmar
+  Resultado esperado: Usuario eliminado permanentemente.
+  Estado: Exitoso
+
+CP-048: Validar campos obligatorios de usuario
+  Pasos: Login Coordinador > abrir modal > dejar campos vacios > "Crear"
+  Resultado esperado: Mensajes de error en nombre, apellido, correo y password.
+  Estado: Exitoso
+
+CP-049: Correo invalido en usuario
+  Pasos: Login Coordinador > ingresar correo sin formato valido
+  Resultado esperado: Mensaje "Formato de correo invalido".
+  Estado: Exitoso
+
+CP-050: Password menor a 6 caracteres
+  Pasos: Login Coordinador > ingresar password de 3 caracteres
+  Resultado esperado: Mensaje "Minimo 6 caracteres".
+  Estado: Exitoso
+
+CP-051: Tutor no puede acceder a usuarios
+  Pasos: Login Tutor > intentar navegar a /usuarios
+  Resultado esperado: RoleGuard redirige al dashboard.
+  Estado: Exitoso
+
+CP-052: Estudiante no puede acceder a usuarios
+  Pasos: Login Estudiante > intentar navegar a /usuarios
+  Resultado esperado: RoleGuard redirige al dashboard.
+  Estado: Exitoso
+
+
+================================================================================
+MODULO 8: PERFIL Y CAMBIO DE CONTRASENA
+================================================================================
+
+CP-053: Ver perfil (cualquier rol)
+  Pasos: Login > ir a "Mi Perfil"
+  Resultado esperado: Se muestran nombre, correo, rol y avatar con iniciales.
+  Estado: Exitoso
+
+CP-054: Cambiar contrasena exitoso
+  Pasos: Login > "Mi Perfil" > contrasena actual + nueva + confirmar > "Actualizar"
+  Resultado esperado: Mensaje "Contrasena actualizada".
+  Estado: Exitoso
+
+CP-055: Contrasena actual incorrecta
+  Pasos: Login > "Mi Perfil" > contrasena actual incorrecta > "Actualizar"
+  Resultado esperado: Mensaje de error "Contrasena incorrecta".
+  Estado: Exitoso
+
+CP-056: Contrasenas nuevas no coinciden
+  Pasos: Login > "Mi Perfil" > contrasenas diferentes > "Actualizar"
+  Resultado esperado: Mensaje "Las contrasenas no coinciden".
+  Estado: Exitoso
+
+CP-057: Nueva contrasena menor a 6 caracteres
+  Pasos: Login > "Mi Perfil" > nueva contrasena de 3 caracteres
+  Resultado esperado: Mensaje "Minimo 6 caracteres".
+  Estado: Exitoso
+
+
+================================================================================
+MODULO 9: DASHBOARD
+================================================================================
+
+CP-058: Dashboard del Coordinador
+  Pasos: Login Coordinador > ver dashboard
+  Resultado esperado: Tarjetas con total proyectos, estudiantes, solicitudes,
+    horas. Grafico de barras de solicitudes.
+  Estado: Exitoso
+
+CP-059: Dashboard del Tutor
+  Pasos: Login Tutor > ver dashboard
+  Resultado esperado: Tarjetas con proyectos asignados, estudiantes a cargo,
+    horas aprobadas/pendientes. Grafico de horas.
+  Estado: Exitoso
+
+CP-060: Dashboard del Estudiante
+  Pasos: Login Estudiante > ver dashboard
+  Resultado esperado: Tarjetas con solicitudes aceptadas, horas aprobadas/
+    pendientes. Grafico de progreso con porcentaje.
+  Estado: Exitoso
+
+CP-061: Tarjetas clickeables
+  Pasos: Login cualquier rol > clic en una tarjeta del dashboard
+  Resultado esperado: Navega al modulo correspondiente.
+  Estado: Exitoso
+
+CP-062: Saludo personalizado
+  Pasos: Login a horas del dia
+  Resultado esperado: "Buenos dias" (6-12h), "Buenas tardes" (12-18h),
+    "Buenas noches" (18h+).
+  Estado: Exitoso
+
+================================================================================
+ RESUMEN DE CASOS DE PRUEBA
+================================================================================
+
+  Modulo                          Cantidad   Rango
+  ------------------------------  ---------  --------
+  Autenticacion                   10         CP-001 a CP-010
+  Gestion de Proyectos            12         CP-011 a CP-022
+  Inscripcion de Estudiantes       5         CP-023 a CP-027
+  Solicitudes                      5         CP-028 a CP-032
+  Actividades                      5         CP-033 a CP-037
+  Horas de Vinculacion             6         CP-038 a CP-043
+  Gestion de Usuarios              9         CP-044 a CP-052
+  Perfil y Contrasena              5         CP-053 a CP-057
+  Dashboard                        5         CP-058 a CP-062
+  ------------------------------  ---------  --------
+  TOTAL                           62

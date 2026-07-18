@@ -1,0 +1,171 @@
+-- ============================================================
+-- SCRIPT COMPLETO - Plataforma de Gestion de Proyectos de Vinculacion
+-- Grupo C - Construccion de Software
+-- ------------------------------------------------------------
+-- Ejecutar TODO junto en phpMyAdmin > Pestana SQL > Go
+-- O importar este archivo completo desde Importar
+-- ============================================================
+
+-- Crear base de datos
+CREATE DATABASE IF NOT EXISTS vinculacion_db
+CHARACTER SET utf8mb4
+COLLATE utf8mb4_unicode_ci;
+
+USE vinculacion_db;
+
+-- Desactivar verificacion de claves foraneas temporalmente
+SET FOREIGN_KEY_CHECKS = 0;
+
+-- ============================================================
+-- TABLA: roles
+-- ============================================================
+DROP TABLE IF EXISTS roles;
+CREATE TABLE roles (
+  id_rol INT AUTO_INCREMENT PRIMARY KEY,
+  nombre VARCHAR(50) NOT NULL UNIQUE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+INSERT INTO roles (nombre) VALUES
+('Coordinador'),
+('Tutor Academico'),
+('Estudiante');
+
+-- ============================================================
+-- TABLA: usuarios
+-- ============================================================
+DROP TABLE IF EXISTS usuarios;
+CREATE TABLE usuarios (
+  id_usuario INT AUTO_INCREMENT PRIMARY KEY,
+  nombre VARCHAR(100) NOT NULL,
+  apellido VARCHAR(100) NOT NULL,
+  correo VARCHAR(150) NOT NULL UNIQUE,
+  password VARCHAR(255) NOT NULL,
+  rol_id INT NOT NULL,
+  estado VARCHAR(20) DEFAULT 'activo',
+  FOREIGN KEY (rol_id) REFERENCES roles(id_rol)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Contrasenas: Coord123*, Tutor123*, Est12345*
+INSERT INTO usuarios (nombre, apellido, correo, password, rol_id, estado) VALUES
+('Carlos', 'Mendoza', 'coordinador@ug.edu.ec', '$2y$10$RVPD53pWTuJoTJ8wz192v.foxVvfne1hq5.Vpph6ViUCNP2zWTJAa', 1, 'activo'),
+('Laura', 'Torres', 'tutor@ug.edu.ec', '$2y$10$GPlfUkjjLQX2oOBrvoRbe.GpWnTUj/gQBVn3ofhxMOK4pE7U9VraO', 2, 'activo'),
+('Ana', 'Garcia', 'estudiante@ug.edu.ec', '$2y$10$zfS8wP7xyDMcOE8KkoiTHuMPyjzcpgdSqMxqm6YfkiAXcvdEdwxMC', 3, 'activo'),
+('Pedro', 'Ramirez', 'tutor2@ug.edu.ec', '$2y$10$GPlfUkjjLQX2oOBrvoRbe.GpWnTUj/gQBVn3ofhxMOK4pE7U9VraO', 2, 'activo');
+
+-- ============================================================
+-- TABLA: facultades
+-- ============================================================
+DROP TABLE IF EXISTS facultades;
+CREATE TABLE facultades (
+  id_facultad INT AUTO_INCREMENT PRIMARY KEY,
+  nombre VARCHAR(150) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+INSERT INTO facultades (nombre) VALUES
+('Facultad de Ingenieria'),
+('Facultad de Ciencias de la Salud'),
+('Facultad de Administracion');
+
+-- ============================================================
+-- TABLA: carreras
+-- ============================================================
+DROP TABLE IF EXISTS carreras;
+CREATE TABLE carreras (
+  id_carrera INT AUTO_INCREMENT PRIMARY KEY,
+  facultad_id INT NOT NULL,
+  nombre VARCHAR(150) NOT NULL,
+  FOREIGN KEY (facultad_id) REFERENCES facultades(id_facultad)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+INSERT INTO carreras (facultad_id, nombre) VALUES
+(1, 'Ingenieria en Sistemas'),
+(1, 'Ingenieria Civil'),
+(2, 'Medicina'),
+(3, 'Administracion de Empresas');
+
+-- ============================================================
+-- TABLA: proyectos
+-- ============================================================
+DROP TABLE IF EXISTS proyectos;
+CREATE TABLE proyectos (
+  id_proyecto INT AUTO_INCREMENT PRIMARY KEY,
+  nombre VARCHAR(150) NOT NULL,
+  descripcion TEXT NOT NULL,
+  tutor_id INT NOT NULL,
+  facultad_id INT NOT NULL,
+  carrera_id INT NOT NULL,
+  cupos_max INT NOT NULL,
+  cupos_usados INT NOT NULL DEFAULT 0,
+  estado VARCHAR(20) DEFAULT 'activo',
+  fecha_inicio DATE NULL,
+  fecha_fin DATE NULL,
+  FOREIGN KEY (tutor_id) REFERENCES usuarios(id_usuario),
+  FOREIGN KEY (facultad_id) REFERENCES facultades(id_facultad),
+  FOREIGN KEY (carrera_id) REFERENCES carreras(id_carrera)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Proyectos de prueba
+INSERT INTO proyectos (nombre, descripcion, tutor_id, facultad_id, carrera_id, cupos_max, cupos_usados, estado) VALUES
+('Alfabetizacion Digital', 'Proyecto de apoyo digital a comunidades rurales.', 2, 1, 1, 30, 5, 'activo'),
+('Salud Comunitaria Web', 'Plataforma web para gestion de salud comunitaria.', 2, 2, 3, 25, 10, 'activo'),
+('Desarrollo de Software Educativo', 'Aplicacion web para apoyo educativo.', 2, 1, 1, 20, 0, 'activo');
+
+-- ============================================================
+-- TABLA: solicitudes
+-- ============================================================
+DROP TABLE IF EXISTS solicitudes;
+CREATE TABLE solicitudes (
+  id_solicitud INT AUTO_INCREMENT PRIMARY KEY,
+  estudiante_id INT NOT NULL,
+  proyecto_id INT NOT NULL,
+  estado VARCHAR(20) DEFAULT 'pendiente',
+  fecha_solicitud DATETIME NOT NULL,
+  FOREIGN KEY (estudiante_id) REFERENCES usuarios(id_usuario),
+  FOREIGN KEY (proyecto_id) REFERENCES proyectos(id_proyecto)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Solicitudes de prueba
+INSERT INTO solicitudes (estudiante_id, proyecto_id, estado, fecha_solicitud) VALUES
+(3, 1, 'aceptada', NOW()),
+(3, 2, 'pendiente', NOW());
+
+-- ============================================================
+-- TABLA: actividades (con titulo)
+-- ============================================================
+DROP TABLE IF EXISTS actividades;
+CREATE TABLE actividades (
+  id_actividad INT AUTO_INCREMENT PRIMARY KEY,
+  proyecto_id INT NOT NULL,
+  tutor_id INT NOT NULL,
+  titulo VARCHAR(200) NOT NULL DEFAULT '',
+  fecha DATE NOT NULL,
+  descripcion TEXT NOT NULL,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (proyecto_id) REFERENCES proyectos(id_proyecto),
+  FOREIGN KEY (tutor_id) REFERENCES usuarios(id_usuario)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- ============================================================
+-- TABLA: horas_vinculacion
+-- ============================================================
+DROP TABLE IF EXISTS horas_vinculacion;
+CREATE TABLE horas_vinculacion (
+  id_hora INT AUTO_INCREMENT PRIMARY KEY,
+  estudiante_id INT NOT NULL,
+  proyecto_id INT NOT NULL,
+  tutor_id INT NOT NULL,
+  actividad_id INT,
+  fecha_actividad DATE NOT NULL,
+  descripcion TEXT NOT NULL,
+  horas DECIMAL(5,2) NOT NULL,
+  estado VARCHAR(20) DEFAULT 'pendiente',
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (estudiante_id) REFERENCES usuarios(id_usuario),
+  FOREIGN KEY (proyecto_id) REFERENCES proyectos(id_proyecto),
+  FOREIGN KEY (tutor_id) REFERENCES usuarios(id_usuario),
+  FOREIGN KEY (actividad_id) REFERENCES actividades(id_actividad)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Reactivar verificacion de claves foraneas
+SET FOREIGN_KEY_CHECKS = 1;
+

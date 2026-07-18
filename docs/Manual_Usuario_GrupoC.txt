@@ -1,0 +1,307 @@
+================================================================================
+ MANUAL DE USUARIO - Plataforma de Gestion de Proyectos de Vinculacion
+ Grupo C - Construccion de Software
+================================================================================
+
+Este manual describe paso a paso como utilizar la plataforma para cada uno
+de los tres roles del sistema: Coordinador, Tutor Academico y Estudiante.
+
+
+1. ACCESO AL SISTEMA
+================================================================================
+
+1.1 Abrir el navegador y dirigirse a: http://localhost:4200
+
+1.2 Se mostrara la pantalla de login con los campos:
+    - Correo electronico
+    - Contrasena
+
+1.3 Ingresar las credenciales correspondientes al rol:
+
+    Usuario                 Contrasena     Rol
+    ----------------------  -------------  ----------------
+    coordinador@ug.edu.ec   Coord123*      Coordinador
+    tutor@ug.edu.ec         Tutor123*      Tutor Academico
+    estudiante@ug.edu.ec    Est12345*      Estudiante
+
+1.4 Hacer clic en "Iniciar Sesion".
+
+1.5 Si las credenciales son correctas, el sistema redirige al dashboard.
+
+
+2. INTERFAZ GENERAL
+================================================================================
+
+La interfaz esta compuesta por:
+
+  BARRA LATERAL (Izquierda):
+    - Avatar con iniciales del usuario.
+    - Nombre completo y rol.
+    - Enlaces de navegacion segun el rol.
+    - Boton "Cerrar sesion".
+
+  CONTENIDO PRINCIPAL (Derecha):
+    - Dashboard o pagina seleccionada.
+    - Boton de regreso (cuando aplica).
+
+
+3. MANUAL DEL COORDINADOR
+================================================================================
+
+El Coordinador es el administrador del sistema. Tiene acceso total a todos
+los modulos.
+
+3.1 DASHBOARD (Pagina principal)
+
+  Al iniciar sesion se muestra el dashboard con:
+    - Saludo personalizado ("Buenos dias", "Buenas tardes", "Buenas noches").
+    - Tarjetas con estadisticas: proyectos activos, estudiantes activos,
+      solicitudes pendientes, solicitudes aceptadas, horas aprobadas totales.
+    - Grafico de barras de solicitudes (pendientes vs aceptadas).
+    - Cada tarjeta es clickeable y lleva al modulo correspondiente.
+
+3.2 GESTION DE PROYECTOS
+
+  3.2.1 Ver lista de proyectos
+    - Hacer clic en "Proyectos" en el sidebar.
+    - Se muestra una tabla con: nombre, tutor, facultad, carrera, cupos.
+    - Usar la barra de busqueda para filtrar por nombre, tutor, facultad, etc.
+    - Navegar entre paginas con los botones de paginacion.
+
+  3.2.2 Crear un proyecto
+    - Hacer clic en "+ Nuevo Proyecto".
+    - Llenar el formulario:
+      * Nombre del proyecto (obligatorio, solo letras, minimo 2 palabras).
+      * Descripcion (obligatoria).
+      * Facultad (seleccionar de la lista).
+      * Carrera (se filtra automaticamente segun la facultad).
+      * Tutor (seleccionar de la lista de tutores activos).
+      * Cupos (1 a 60).
+      * Fecha de inicio (opcional).
+      * Fecha de fin (opcional).
+    - Hacer clic en "Guardar".
+    - Si hay errores de validacion, se muestran en rojo bajo cada campo.
+
+  3.2.3 Editar un proyecto
+    - En la tabla de proyectos, hacer clic en el icono de lapiz.
+    - Se abre un modal con los datos actuales.
+    - Modificar los campos necesarios.
+    - Hacer clic en "Guardar".
+
+  3.2.4 Eliminar un proyecto
+    - En la tabla de proyectos, hacer clic en el icono de X.
+    - Aparecera un cuadro de confirmacion.
+    - Hacer clic en "Aceptar" para confirmar.
+
+  3.2.5 Ver detalle de un proyecto
+    - Hacer clic en el boton de tres puntos de un proyecto.
+    - Se expande un panel con:
+      * Descripcion completa.
+      * Tutor, facultad, carrera.
+      * Fechas de inicio y fin.
+      * Cupos usados / cupos maximos.
+      * Lista de estudiantes inscritos (nombre, correo, fecha de inscripcion).
+    - Para cerrar el detalle, volver a clic en el boton.
+
+  3.2.6 Remover estudiante de un proyecto
+    - Abrir el detalle del proyecto.
+    - Junto al nombre del estudiante, hacer clic en la X.
+    - Confirmar la accion.
+    - El estudiante es removido y los cupos se actualizan.
+
+3.3 GESTION DE SOLICITUDES
+
+  - Hacer clic en "Solicitudes" en el sidebar.
+  - Se muestran tres secciones:
+    * Solicitudes pendientes (con botones Aceptar/Denegar).
+    * Solicitudes procesadas (agrupadas por proyecto).
+    * Estudiantes asignados por proyecto.
+  - Usar la barra de busqueda para filtrar.
+  - Para aceptar/denegar: hacer clic en el boton correspondiente y confirmar.
+
+3.4 GESTION DE USUARIOS
+
+  - Hacer clic en "Usuarios" en el sidebar.
+  - Se muestra la tabla de todos los usuarios del sistema.
+
+  3.4.1 Crear usuario
+    - Hacer clic en "+ Nuevo Usuario".
+    - Llenar: nombre, apellido, correo, contrasena, rol.
+    - Hacer clic en "Crear".
+
+  3.4.2 Editar usuario
+    - Hacer clic en el icono de lapiz junto al usuario.
+    - Modificar campos (la contrasena es opcional al editar).
+    - Hacer clic en "Actualizar".
+
+  3.4.3 Activar/Desactivar usuario
+    - Hacer clic en el icono de check/cross junto al usuario.
+    - El estado cambia entre Activo e Inactivo.
+
+  3.4.4 Eliminar usuario
+    - Hacer clic en el icono de X junto al usuario.
+    - Confirmar la eliminacion.
+
+3.5 VER PROYECTOS (como cualquier usuario)
+
+  - Hacer clic en "Proyectos" en el sidebar.
+  - Se muestra la lista completa de todos los proyectos.
+  - El Coordinador puede ver todos los proyectos (de todos los tutores).
+
+
+4. MANUAL DEL TUTOR ACADEMICO
+================================================================================
+
+El Tutor gestiona sus propias actividades, aprueba horas y revisa solicitudes
+de sus proyectos.
+
+4.1 DASHBOARD
+
+  Al iniciar sesion se muestra:
+    - Proyectos asignados al tutor.
+    - Estudiantes a cargo.
+    - Horas pendientes / aprobadas.
+    - Barra de progreso con porcentaje.
+    - Grafico de barras de horas por estado.
+
+4.2 VER MIS PROYECTOS
+
+  - Hacer clic en "Proyectos" en el sidebar.
+  - Se muestran SOLO los proyectos asignados al tutor (no los de otros tutores).
+  - Usar la barra de busqueda para filtrar.
+  - Expandir el detalle para ver estudiantes inscritos.
+
+4.3 CREAR ACTIVIDAD
+
+  - Hacer clic en "Crear Actividad" en el sidebar.
+  - Llenar el formulario:
+    * Proyecto (solo aparecen los proyectos del tutor).
+    * Titulo de la actividad (3-200 caracteres).
+    * Fecha.
+    * Descripcion (minimo 5 caracteres).
+  - Hacer clic en "Crear Actividad".
+  - La actividad aparecera en la lista de abajo.
+
+4.4 GESTIONAR ACTIVIDADES
+
+  - En la lista de actividades, cada tarjeta muestra:
+    * Titulo, proyecto, fecha, descripcion.
+    * Horas aprobadas, horas pendientes, total de registros.
+  - Hacer clic en una tarjeta para expandir y ver la tabla de estudiantes
+    que registraron horas en esa actividad.
+  - Hacer clic en la X para eliminar una actividad.
+
+4.5 GESTIONAR SOLICITUDES
+
+  - Hacer clic en "Solicitudes" en el sidebar.
+  - Solo aparecen las solicitudes de los proyectos del tutor.
+  - Aprobar o denegar con los botones correspondientes.
+
+4.6 APROBAR HORAS
+
+  - Hacer clic en "Aprobar Horas" en el sidebar.
+  - Se muestran los registros de horas pendientes de los estudiantes.
+  - Para cada registro:
+    * Hacer clic en "Aprobar" para aprobar.
+    * Hacer clic en "Rechazar" para rechazar.
+  - Usar la barra de busqueda para filtrar por estudiante, proyecto o descripcion.
+
+4.7 CAMBIO DE CONTRASENA
+
+  - Hacer clic en "Mi Perfil" en el sidebar.
+  - Ingresar contrasena actual.
+  - Ingresar nueva contrasena (minimo 6 caracteres).
+  - Confirmar la nueva contrasena.
+  - Hacer clic en "Actualizar contrasena".
+
+
+5. MANUAL DEL ESTUDIANTE
+================================================================================
+
+El Estudiante se inscribe en proyectos, registra horas y ve su progreso.
+
+5.1 DASHBOARD
+
+  Al iniciar sesion se muestra:
+    - Solicitudes aceptadas.
+    - Total de solicitudes.
+    - Horas aprobadas / pendientes.
+    - Grafico de progreso con porcentaje completado.
+
+5.2 VER PROYECTOS E INSCRIBIRSE
+
+  - Hacer clic en "Proyectos" en el sidebar.
+  - Se muestra la lista de todos los proyectos disponibles.
+  - Para inscribirse:
+    * Hacer clic en "Inscribirse" junto al proyecto deseado.
+    * El sistema verifica: cupos, duplicados, un proyecto por estudiante.
+    * Si es exitoso, se muestra "Solicitud enviada correctamente".
+    * Si hay un error, se muestra el motivo.
+  - Los proyectos llenos muestran "Lleno" en lugar del boton.
+  - Expandir el detalle con el boton de tres puntos.
+
+5.3 VER MIS SOLICITUDES
+
+  - Hacer clic en "Mis solicitudes" en el sidebar.
+  - Se muestran tres secciones:
+    * En espera (solicitudes pendientes) - badge amarillo.
+    * Aceptadas - badge verde.
+    * Denegadas - badge rojo.
+
+5.4 REGISTRAR HORAS
+
+  - Hacer clic en "Registrar Horas" en el sidebar.
+  - Seleccionar una actividad de la lista (solo actividades de proyectos
+    donde el estudiante esta inscrito).
+  - Ingresar las horas trabajadas (1 a 8 por registro).
+  - Hacer clic en "Registrar Horas".
+  - Se muestra "Horas registradas correctamente. Pendiente de aprobacion."
+
+5.5 VER MIS HORAS
+
+  - Hacer clic en "Mis Horas" en el sidebar.
+  - Se muestran tarjetas de resumen:
+    * Horas aprobadas.
+    * Horas pendientes.
+    * Horas rechazadas.
+    * Total de registros.
+  - Abajo se muestra la tabla completa con fecha, proyecto, descripcion,
+    horas y estado.
+
+5.6 CAMBIO DE CONTRASENA
+
+  - Hacer clic en "Mi Perfil" en el sidebar.
+  - Seguir el mismo proceso descrito en el paso 4.7.
+
+
+6. CIERRE DE SESION
+================================================================================
+
+  - Hacer clic en "Cerrar sesion" en la parte inferior del sidebar.
+  - El sistema limpia el token y redirige al login.
+  - Se recomienda cerrar sesion al terminar de usar el sistema.
+
+
+7. ERRORES COMUNES Y SOLUCIONES
+================================================================================
+
+  ERROR: "Credenciales invalidas"
+  CAUSA: Correo o contrasena incorrectos, o usuario inactivo.
+  SOLUCION: Verificar credenciales. Si el usuario esta inactivo, contactar
+            al Coordinador para reactivarlo.
+
+  ERROR: "No hay cupos disponibles"
+  CAUSA: El proyecto esta lleno.
+  SOLUCION: Elegir otro proyecto con cupos disponibles.
+
+  ERROR: "Ya estas inscrito en un proyecto"
+  CAUSA: El estudiante ya tiene una solicitud aceptada en otro proyecto.
+  SOLUCION: Salir del proyecto actual primero (solo el Coordinador puede hacerlo).
+
+  ERROR: "No se pudieron cargar los datos"
+  CAUSA: El servidor PHP no esta corriendo.
+  SOLUCION: Verificar que XAMPP este activo y el servidor PHP este ejecutandose.
+
+  ERROR: La pagina queda en blanco
+  CAUSA: El token expiro (duracion 2 horas).
+  SOLUCION: Volver a iniciar sesion.

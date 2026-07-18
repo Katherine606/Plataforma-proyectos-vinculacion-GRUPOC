@@ -1,0 +1,299 @@
+================================================================================
+ REQUERIMIENTOS FUNCIONALES Y NO FUNCIONALES
+ Plataforma de Gestion de Proyectos de Vinculacion
+ Grupo C - Construccion de Software
+================================================================================
+
+
+1. REQUERIMIENTOS FUNCIONALES
+================================================================================
+
+
+RF01 - AUTENTICACION Y GESTION DE ROLES
+--------------------------------------------------------------------------------
+  Descripcion: El sistema permite a los usuarios autenticarse mediante correo
+  electronico y contrasena. Se genera un token JWT que expira en 2 horas.
+  Roles: Coordinador, Tutor Academico, Estudiante.
+  Entrada: Correo + contrasena.
+  Salida: Token JWT + datos del usuario.
+  Validaciones:
+    - Correo y contrasena son obligatorios.
+    - La contrasena se compara con hash bcrypt.
+    - Usuarios con estado "inactivo" no pueden iniciar sesion.
+    - El token expira en 7200 segundos.
+  Actores: Todos los usuarios.
+  Prioridad: Alta.
+
+
+RF02 - GESTION DE PROYECTOS (CRUD)
+--------------------------------------------------------------------------------
+  Descripcion: El Coordinador puede crear, editar y eliminar proyectos de
+  vinculacion. Cada proyecto tiene nombre, descripcion, tutor, facultad,
+  carrera, cupos maximos (1-60), fecha de inicio y fecha de fin.
+  Entrada: Formulario con todos los campos del proyecto.
+  Salida: Proyecto registrado en la base de datos.
+  Validaciones:
+    - Nombre obligatorio, solo letras y espacios, minimo 2 palabras.
+    - Descripcion obligatoria.
+    - Facultad, carrera y tutor son obligatorios.
+    - Cupos entre 1 y 60.
+    - Solo el Coordinador puede crear/editar/eliminar.
+  Actores: Coordinador.
+  Prioridad: Alta.
+
+
+RF03 - INSCRIPCION DE ESTUDIANTES EN PROYECTOS
+--------------------------------------------------------------------------------
+  Descripcion: El estudiante puede enviar una solicitud de inscripcion a un
+  proyecto que tenga cupos disponibles. El sistema valida que el estudiante
+  no este inscrito en otro proyecto.
+  Entrada: Boton "Inscribirse" en la lista de proyectos.
+  Salida: Solicitud creada con estado "pendiente".
+  Validaciones:
+    - El proyecto debe tener cupos_usados < cupos_max.
+    - El proyecto debe estar activo.
+    - No puede existir una solicitud duplicada (pendiente o aceptada).
+    - El estudiante solo puede estar en 1 proyecto a la vez.
+  Actores: Estudiante.
+  Prioridad: Alta.
+
+
+RF04 - GESTION DE SOLICITUDES (ACEPTAR/DENEGAR)
+--------------------------------------------------------------------------------
+  Descripcion: El Tutor o Coordinador puede aceptar o denegar solicitudes de
+  inscripcion pendientes. Al aceptar, se incrementa cupos_usados del proyecto.
+  Entrada: Botones "Aceptar" / "Denegar" en la pagina de solicitudes.
+  Salida: Estado de solicitud actualizado + cupos actualizados.
+  Validaciones:
+    - Solo se pueden gestionar solicitudes con estado "pendiente".
+    - Al aceptar, se verifica que haya cupos disponibles.
+    - La operacion se realiza dentro de una transaccion MySQL.
+    - El Tutor solo ve solicitudes de sus propios proyectos.
+  Actores: Tutor, Coordinador.
+  Prioridad: Alta.
+
+
+RF05 - GESTION DE ACTIVIDADES DEL TUTOR
+--------------------------------------------------------------------------------
+  Descripcion: El Tutor puede crear actividades dentro de sus proyectos
+  asignados. Cada actividad tiene titulo, fecha y descripcion. El Tutor
+  puede ver estadisticas de cada actividad y eliminarla.
+  Entrada: Formulario con titulo, proyecto, fecha y descripcion.
+  Salida: Actividad registrada en la base de datos.
+  Validaciones:
+    - Titulo obligatorio (3-200 caracteres).
+    - Proyecto obligatorio (solo aparecen los del tutor).
+    - Fecha obligatoria.
+    - Descripcion obligatoria (minimo 5 caracteres).
+    - Solo el Tutor asignado puede crear/eliminar actividades.
+  Actores: Tutor.
+  Prioridad: Alta.
+
+
+RF06 - REGISTRO DE HORAS DE VINCULACION
+--------------------------------------------------------------------------------
+  Descripcion: El estudiante registra horas trabajadas seleccionando una
+  actividad. Las horas quedan con estado "pendiente" hasta que el Tutor
+  las apruebe o rechace.
+  Entrada: Formulario con actividad y horas (1-8 por registro).
+  Salida: Registro de horas creado con estado "pendiente".
+  Validaciones:
+    - Actividad obligatoria.
+    - Horas entre 1 y 8.
+    - La actividad debe pertenecer a un proyecto donde el estudiante esta
+      inscrito.
+  Actores: Estudiante.
+  Prioridad: Alta.
+
+
+RF07 - APROBACION DE HORAS POR TUTOR
+--------------------------------------------------------------------------------
+  Descripcion: El Tutor revisa los registros de horas de los estudiantes en
+  sus proyectos y puede aprobarlos o rechazarlos.
+  Entrada: Botones "Aprobar" / "Rechazar" en la pagina de aprobacion.
+  Salida: Estado del registro actualizado (aprobada/rechazada).
+  Validaciones:
+    - Solo se pueden gestionar registros con estado "pendiente".
+    - El Tutor solo ve horas de sus propios proyectos.
+  Actores: Tutor.
+  Prioridad: Alta.
+
+
+RF08 - CRUD DE USUARIOS (SOLO COORDINADOR)
+--------------------------------------------------------------------------------
+  Descripcion: El Coordinador puede listar, crear, editar, activar/desactivar
+  y eliminar usuarios del sistema.
+  Entrada: Formulario con nombre, apellido, correo, contrasena y rol.
+  Salida: Usuario creado/actualizado/eliminado en la base de datos.
+  Validaciones:
+    - Nombre, apellido y correo son obligatorios.
+    - Correo con formato valido y unico.
+    - Contrasena obligatoria al crear (minimo 6 caracteres).
+    - Contrasena opcional al editar.
+    - Solo el Coordinador puede gestionar usuarios.
+  Actores: Coordinador.
+  Prioridad: Alta.
+
+
+RF09 - PERFIL DE USUARIO Y CAMBIO DE CONTRASENA
+--------------------------------------------------------------------------------
+  Descripcion: Cualquier usuario puede ver su perfil y cambiar su contrasena.
+  Entrada: Contrasena actual + nueva contrasena + confirmacion.
+  Salida: Contrasena actualizada.
+  Validaciones:
+    - Contrasena actual obligatoria.
+    - Nueva contrasena minimo 6 caracteres.
+    - Confirmacion debe coincidir con la nueva contrasena.
+    - La contrasena actual debe ser correcta.
+  Actores: Todos los usuarios.
+  Prioridad: Media.
+
+
+RF10 - BUSQUEDA Y FILTROS EN TABLAS
+--------------------------------------------------------------------------------
+  Descripcion: Las paginas de proyectos, solicitudes y horas de aprobacion
+  incluyen una barra de busqueda que filtra registros en tiempo real.
+  Entrada: Texto en la barra de busqueda.
+  Salida: Lista filtrada por los campos relevantes.
+  Filtros:
+    - Proyectos: nombre, tutor, facultad, carrera, descripcion.
+    - Solicitudes: estudiante, proyecto, estado.
+    - Horas: estudiante, proyecto, descripcion.
+  Actores: Todos los usuarios.
+  Prioridad: Media.
+
+
+RF11 - PAGINACION DE RESULTADOS
+--------------------------------------------------------------------------------
+  Descripcion: La lista de proyectos se muestra con paginacion de 8 registros
+  por pagina, con botones de navegacion.
+  Entrada: Click en botones de paginacion.
+  Salida: Pagina correspondiente de resultados.
+  Validaciones:
+    - Paginacion se resetea al buscar.
+    - Minimo 1 pagina aunque no haya resultados.
+  Actores: Todos los usuarios.
+  Prioridad: Baja.
+
+
+RF12 - DASHBOARD CON INFORMACION POR ROL
+--------------------------------------------------------------------------------
+  Descripcion: Cada usuario ve un panel de inicio personalizado segun su rol.
+  - Coordinador: proyectos activos, estudiantes, solicitudes, horas.
+  - Tutor: proyectos asignados, estudiantes a cargo, horas aprobadas/pendientes.
+  - Estudiante: solicitudes aceptadas, horas aprobadas/pendientes.
+  Incluye graficos de barras CSS y barras de progreso.
+  Entrada: Navegacion automatica al iniciar sesion.
+  Salida: Panel con estadisticas y graficos.
+  Actores: Todos los usuarios.
+  Prioridad: Media.
+
+
+RF13 - FILTRO DE PROYECTOS Y SOLICITUDES POR TUTOR
+--------------------------------------------------------------------------------
+  Descripcion: Cuando un Tutor inicia sesion, solo ve los proyectos que le
+  pertenecen y las solicitudes de esos proyectos. El Coordinador ve todo.
+  Entrada: Filtro automatico basado en el rol del JWT.
+  Salida: Datos filtrados por tutor_id en el backend.
+  Validaciones:
+    - El filtro se aplica en el servidor (no en el frontend).
+    - El Tutor no puede acceder a proyectos de otros tutores via URL.
+  Actores: Tutor, Coordinador.
+  Prioridad: Alta.
+
+
+RF14 - ELIMINACION DE ESTUDIANTE POR COORDINADOR
+--------------------------------------------------------------------------------
+  Descripcion: El Coordinador puede remover a un estudiante de un proyecto
+  desde el detalle del proyecto. La solicitud se cambia a "denegada" y
+  se decrementa cupos_usados.
+  Entrada: Boton "X" junto al estudiante en el detalle del proyecto.
+  Salida: Solicitud actualizada + cupos decrementados.
+  Validaciones:
+    - Solo el Coordinador puede realizar esta accion.
+    - La operacion se realiza dentro de una transaccion MySQL.
+  Actores: Coordinador.
+  Prioridad: Media.
+
+
+RF15 - VISUALIZACION DEL DETALLE DE PROYECTO
+--------------------------------------------------------------------------------
+  Descripcion: Cualquier usuario puede expandir un proyecto para ver su
+  descripcion completa, fechas, facultad, carrera, tutor y lista de
+  estudiantes inscritos con sus correos y fecha de inscripcion.
+  Entrada: Click en el boton de detalle de un proyecto.
+  Salida: Panel expandible con informacion completa.
+  Actores: Todos los usuarios.
+  Prioridad: Media.
+
+
+RF16 - VISUALIZACION DE SOLICITUDES DEL ESTUDIANTE
+--------------------------------------------------------------------------------
+  Descripcion: El estudiante puede ver sus propias solicitudes agrupadas
+  en tres categorias: Pendientes, Aceptadas y Denegadas, cada una con
+  su respectivo badge de color.
+  Entrada: Navegacion a "Mis solicitudes".
+  Salida: Lista de solicitudes del estudiante actual.
+  Actores: Estudiante.
+  Prioridad: Media.
+
+
+
+2. REQUERIMIENTOS NO FUNCIONALES
+================================================================================
+
+
+RNF01 - RENDIMIENTO
+--------------------------------------------------------------------------------
+  Descripcion: Las respuestas de la API REST deben retornar en menos de
+  1 segundo bajo condiciones normales de uso.
+  Criterio: Tiempo de respuesta < 1000ms en el 95% de las peticiones.
+
+
+RNF02 - SEGURIDAD
+--------------------------------------------------------------------------------
+  Descripcion: El sistema debe proteger los datos y la integridad mediante:
+    - Sentencias SQL preparadas (PDO prepared statements) contra inyeccion SQL.
+    - Contrasenas hasheadas con bcrypt (password_hash/password_verify).
+    - Tokens JWT con expiracion de 2 horas.
+    - Proteccion de rutas con AuthGuard y RoleGuard en el frontend.
+    - Autorizacion por rol en cada endpoint del backend.
+    - Headers CORS configurados solo para el dominio del frontend.
+
+
+RNF03 - ARQUITECTURA WEB Y ESCALABILIDAD
+--------------------------------------------------------------------------------
+  Descripcion: El sistema sigue el patron MVC (Model-View-Controller) con
+  separacion en capas:
+    - Frontend: Angular 21 (SPA) con componentes standalone.
+    - Backend: PHP 8.0 con controladores, DAOs y DTOs.
+    - Base de datos: MySQL en tercera forma normal (3FN).
+  Comunicacion frontend-backend exclusivamente via JSON/REST.
+
+
+RNF04 - USABILIDAD E INTERFAZ RESPONSIVE
+--------------------------------------------------------------------------------
+  Descripcion: La interfaz debe ser intuitiva y accesible para usuarios no
+  tecnicos. Diseno responsive utilizando Flexbox y CSS Grid. Formularios con
+  validacion en tiempo real y mensajes de error claros. Sin dependencias de
+  librerias externas de UI (CSS personalizado).
+
+
+RNF05 - PERSISTENCIA E INTEGRIDAD DE DATOS
+--------------------------------------------------------------------------------
+  Descripcion: Todos los datos se almacenan en MySQL con:
+    - Claves foraneas para integridad referencial.
+    - Restricciones NOT NULL y UNIQUE.
+    - Enums para campos de estado.
+    - Transacciones MySQL en operaciones criticas (aceptar solicitud,
+      sacar estudiante).
+
+
+RNF06 - SUPRESION DE ERRORES PHP
+--------------------------------------------------------------------------------
+  Descripcion: En entorno de produccion, los errores de PHP no se muestran
+  al usuario final. Se configuran:
+    - error_reporting(E_ERROR | E_PARSE) en index.php.
+    - display_errors = 0 en php.ini.
+  Los errores se registran internamente sin exponer detalles tecnicos.
+

@@ -1,0 +1,229 @@
+================================================================================
+ ARTICULO TECNICO - Plataforma de Gestion de Proyectos de Vinculacion
+ Grupo C - Construccion de Software
+================================================================================
+CONSIDERAR LOS SIGUIENTES PUNTOS:
+
+2. OBJETIVOS
+================================================================================
+
+2.1 Objetivo General
+
+  Diseniar e implementar una plataforma web que permita gestionar de forma
+  integral los proyectos de vinculacion comunitaria de la universidad.
+
+2.2 Objetivos Especificos
+
+  - Implementar autenticacion segura con control de roles y tokens JWT.
+  - Desarrollar modulo de CRUD de proyectos con validaciones completas.
+  - Implementar motor de inscripcion con control de cupos en tiempo real.
+  - Desarrollar sistema de registro y aprobacion de horas de vinculacion.
+  - Implementar dashboards personalizados por rol con graficos visuales.
+
+
+3. MATERIALES Y METODOS
+================================================================================
+
+3.1 Metodologia de Desarrollo
+
+  Se utilizo una metodologia de desarrollo incremental, donde el sistema se
+  construyo en iteraciones sucesivas, cada una agregando funcionalidad sobre
+  la anterior. Esto permitio entregar valor continuamente y adaptar el
+  desarrollo a los requerimientos cambiantes...
+
+3.2 Arquitectura del Sistema
+
+  El sistema sigue el patron de arquitectura MVC (Model-View-Controller):
+
+  MODEL (Modelo): Capa de acceso a datos compuesta por DAOs (Data Access
+    Object) y DTOs (Data Transfer Object). Los DAOs ejecutan sentencias SQL
+    preparadas via PDO para garantizar seguridad contra inyeccion SQL. Los
+    DTOs mapean registros de base de datos a objetos PHP y los serializan
+    a formato JSON...
+
+  VIEW (Vista): Frontend SPA (Single Page Application) construido con
+    Angular 21, utilizando componentes standalone, servicios HTTP e
+    interceptores para la comunicacion con el backend...
+
+  CONTROLLER (Controlador): Recibe peticiones HTTP REST, aplica la logica
+    de negocio, valida datos y retorna respuestas JSON con codigos de
+    estado HTTP apropiados...
+
+3.3 Tecnologias Utilizadas
+
+  Frontend:
+    - Angular 21.2.0 (framework SPA)
+    - TypeScript 5.9.2
+    - Zoneless change detection (signals)
+    - CSS personalizado (sin librerias externas)
+
+  Backend:
+    - PHP 8.0
+    - Patron MVC con DTO/DAO/Controller
+    - JWT custom (HMAC-SHA256, TTL 2 horas)
+    - PDO (prepared statements)
+
+  Base de datos:
+    - MySQL 8.0
+    - Tercera forma normal (3FN)
+    - 8 tablas relacionales
+    - Integridad referencial con claves foraneas
+
+  Herramientas:
+    - Visual Studio Code (IDE)
+    - Git/GitHub (control de versiones)
+    - XAMPP (servidor de desarrollo)
+    - npm (gestor de paquetes)
+
+3.4 Seguridad Implementada
+
+  - Sentencias SQL preparadas (PDO) contra inyeccion SQL.
+  - Contrasenas hasheadas con bcrypt (password_hash/password_verify).
+  - Tokens JWT con expiracion de 2 horas.
+  - Proteccion de rutas en frontend (AuthGuard) y backend (autorizarRolOrFail).
+  - Headers CORS configurados exclusivamente para el dominio del frontend.
+  - Supresion de errores PHP en produccion.
+
+
+4. RESULTADOS
+================================================================================
+
+4.1 Modulos Implementados
+
+  Se implementaron exitosamente 8 modulos funcionales:
+
+  Modulo 1 - Autenticacion: Sistema de login con JWT, 3 roles (Coordinador,
+    Tutor, Estudiante), sesion persistente y proteccion de rutas.
+
+  Modulo 2 - Gestion de Proyectos: CRUD completo con validaciones, busqueda
+    en tiempo real, paginacion, fechas de inicio/fin y detalle expandible...
+
+  Modulo 3 - Inscripcion: Estudiantes se inscriben a proyectos con control
+    de cupos, validacion de duplicados y regla de un proyecto por estudiante...
+
+  Modulo 4 - Solicitudes: Flujo de aceptar/denegar con transacciones MySQL
+    que garantizan la integridad de cupos...
+
+  Modulo 5 - Actividades: Tutores crean actividades con titulo, fecha y
+    descripcion, y visualizan estadisticas de horas por actividad...
+
+  Modulo 6 - Horas: Registro de horas por estudiantes (1-8 por registro),
+    aprobacion/rechazo por tutores, resumen y historial...
+
+  Modulo 7 - Usuarios: CRUD completo de usuarios con activar/desactivar
+    y gestion de roles...
+
+  Modulo 8 - Dashboard: Paneles personalizados por rol con graficos de
+    barras CSS, barras de progreso y saludo temporal...
+
+4.2 Base de Datos
+
+  Se disenaron 8 tablas en tercera forma normal:
+    roles, usuarios, facultades, carreras, proyectos, solicitudes,
+    actividades y horas_vinculacion.
+
+  Las tablas estan conectadas mediante claves foraneas que garantizan la
+  integridad referencial. Se utilizaron ENUMs para los campos de estado
+  y transacciones MySQL para operaciones criticas...
+
+4.3 API REST
+
+  Se implementaron 30+ endpoints REST organizados por recurso:
+    auth, proyectos, solicitudes, horas, actividades, dashboard,
+    usuarios, perfil, tutores, facultades, carreras, roles...
+
+  Cada endpoint valida el rol del usuario via JWT antes de procesar
+  la solicitud...
+
+4.4 Frontend Angular
+
+  Se construyeron 13 componentes standalone con:
+    - Formularios reactivos con validacion en tiempo real.
+    - Interceptores HTTP para JWT automatico.
+    - Guards de ruta (AuthGuard y RoleGuard).
+    - Servicios HTTP para comunicacion con el backend.
+    - CSS personalizado responsive (Flexbox + Grid).
+
+
+5. DISCUSION
+================================================================================
+
+5.1 Ventajas de la Arquitectura MVC
+
+  La separacion en capas (MVC) permitio:
+    - Desarrollo paralelo del frontend y backend.
+    - Facil mantenimiento de cada capa de forma independiente.
+    - Reutilizacion de componentes Angular y servicios PHP.
+    - Claridad en la responsabilidad de cada modulo...
+
+5.2 Seguridad
+
+  La implementacion de JWT con expiracion de 2 horas proporciona un balance
+  entre seguridad y experiencia de usuario. Las sentencias SQL preparadas
+  eliminan el riesgo de inyeccion SQL. El hash bcrypt garantiza que las
+  contrasenas no se almacenen en texto plano...
+
+5.3 Reglas de Negocio
+
+  La regla de "un proyecto por estudiante" es una restriccion de negocio
+  critica que se valida tanto en el frontend (deshabilitando el boton de
+  inscripcion) como en el backend (verificando solicitudes activas). Esto
+  garantiza la consistencia incluso si un usuario manipula las peticiones
+  HTTP directamente...
+
+5.4 Filtrado por Tutor
+
+  El sistema filtra automaticamente los datos segun el rol del usuario.
+  Un Tutor solo ve sus propios proyectos, solicitudes y horas. Este filtro
+  se aplica en el servidor (no en el frontend), lo que garantiza que un
+  usuario no pueda acceder a datos de otros tutores manipulando la URL...
+
+5.5 Limitaciones
+
+  - El sistema actualmente no soporta exportacion de reportes a PDF o Excel.
+  - No hay notificaciones por correo electronico.
+  - La paginacion es solo del lado del cliente (frontend).
+  - No hay cache de respuestas del servidor.
+  - El sistema de busqueda es basado en texto simple (no usa indice de busqueda)...
+
+
+6. CONCLUSIONES
+================================================================================
+
+  1. Se logro implementar una plataforma web funcional que centraliza la
+     gestion de proyectos de vinculacion, reemplazando procesos manuales...
+
+  2. La arquitectura MVC con Angular, PHP y MySQL proporciona una base
+     solida, escalable y facil de mantener...
+
+  3. La autenticacion JWT con control de roles garantiza que cada usuario
+     solo acceda a las funcionalidades autorizadas...
+
+  4. Las reglas de negocio (un proyecto por estudiante, control de cupos,
+     transacciones MySQL) aseguran la integridad de los datos...
+
+  5. Los dashboards personalizados por rol mejoran la experiencia de
+     usuario y proporcionan informacion relevante en tiempo real...
+
+  6. La metodologia incremental permitio entregar valor continuamente y
+     adaptar el desarrollo a los requerimientos del proyecto...
+
+  7. El sistema esta preparado para futuras mejoras como exportacion de
+     reportes, notificaciones y paginacion del lado del servidor...
+
+
+7. REFERENCIAS BIBLIOGRAFICAS
+
+8. ANEXOS
+================================================================================
+
+Anexo A: Credenciales de prueba
+  coordinador@ug.edu.ec / Coord123* (Coordinador)
+  tutor@ug.edu.ec / Tutor123* (Tutor Academico)
+  estudiante@ug.edu.ec / Est12345* (Estudiante)
+
+Anexo B: Repositorio del proyecto
+  https://github.com/Katherine606/Plataforma-proyectos-vinculacion-GRUPOC
+
+Anexo C: Estructura de directorios
+  Ver Guia de Instalacion (seccion 11).

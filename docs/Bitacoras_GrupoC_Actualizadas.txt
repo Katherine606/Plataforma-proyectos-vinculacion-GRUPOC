@@ -1,0 +1,272 @@
+================================================================================
+ BITACORAS ACTUALIZADAS - Plataforma de Gestion de Proyectos de Vinculacion
+ Grupo C - Construccion de Software
+================================================================================
+YA LO HAGO YO
+================================================================================
+BITACORA 1 - 6 de mayo de 2026
+================================================================================
+
+  Fecha: 6 de mayo de 2026
+  Tema: Reunion inicial - Seleccion de tema y tecnologias
+
+  Desarrollo de la reunion:
+    Se realizo la primera reunion del Grupo C para definir el tema del proyecto
+    de Construccion de Software. Se discutieron varias opciones y se llego al
+    consenso de desarrollar una plataforma de gestion de proyectos de vinculacion
+    comunitaria.
+
+  Acuerdos:
+    - Tema seleccionado: Plataforma de Gestion de Proyectos de Vinculacion.
+    - Tecnologias: Angular (frontend), PHP (backend), MySQL (base de datos).
+    - Arquitectura: MVC (Model-View-Controller).
+    - Herramientas: Visual Studio Code, Git/GitHub, XAMPP.
+    - Autenticacion: JWT (JSON Web Tokens).
+
+  Participacion: 100% (10 integrantes).
+
+  Responsabilidades: Pendientes de asignar en la siguiente reunion.
+
+
+================================================================================
+BITACORA 2 - 8 de mayo de 2026
+================================================================================
+
+  Fecha: 8 de mayo de 2026
+  Tema: Asignacion de modos de trabajo y definicion de modulos
+
+  Desarrollo de la reunion:
+    Se definieron los 5 modulos del sistema y se asignaron responsabilidades
+    individuales. Se establecieron los modos de trabajo y comunicacion del equipo.
+
+  Acuerdos:
+    - 5 modulos definidos:
+      1. Seguridad y acceso (login, roles, JWT).
+      2. Configuracion de proyectos y cupos (CRUD).
+      3. Motor de inscripcion (solicitudes).
+      4. Registro y auditoria de horas.
+      5. Dashboard de seguimiento.
+
+    - Documentos a desarrollar: Alcance, Requerimientos, Diseno Detallado,
+      Articulo, Plan de Pruebas, Bitacoras.
+
+  Participacion: 100% (10 integrantes).
+
+  Responsabilidades: Asignadas en la siguiente reunion.
+
+
+================================================================================
+BITACORA 3 - 11 de mayo de 2026
+================================================================================
+
+  Fecha: 11 de mayo de 2026
+  Tema: Asignacion final de modulos y creacion del repositorio
+
+  Desarrollo de la reunion:
+    Se asignaron los modulos a cada subgrupo y se creo el repositorio en GitHub.
+    Se inicio el disenio de la base de datos y se completaron los documentos
+    de alcance y diseno detallado.
+
+  Acuerdos:
+    - Asignacion de modulos:
+      Modulo 1 (Seguridad): Amy Baque + Adrian Gavilanes.
+      Modulo 2 (Proyectos/Cupos): Daniel Gualan + Jean Paul Mogollon.
+      Modulo 3 (Inscripcion): Jessie Alay + Ricardo Mazzini + Mariela Nunez.
+      Modulo 4 (Horas): Jhon Intriago.
+      Modulo 5 (Dashboard): Roger Martines + Katherine Mendez.
+
+    - Repositorio creado en GitHub.
+    - Documentos de Alcance y Diseno Detallado completados.
+    - Diagrama ER inicial disenado.
+
+  Participacion: 100% (10 integrantes).
+
+
+================================================================================
+BITACORA 4 - 12 de mayo de 2026
+================================================================================
+
+  Fecha: 12 de mayo de 2026
+  Tema: Desarrollo del articulo y avance individual de modulos
+
+  Desarrollo de la reunion:
+    Se trabajo en la redaccion del articulo tecnico (resumen, introduccion,
+    materiales y metodos). Cada subgrupo avanzo en el desarrollo de sus
+    modulos de forma individual.
+
+  Acuerdos:
+    - Articulo: Se completaron resumen, introduccion y materiales y metodos.
+    - Diagrama ER y arquitectura creados en el repositorio.
+    - Avance por modulo:
+      Modulo 1: 10%
+      Modulo 2: 60%
+      Modulo 3: 10%
+      Modulo 4: 10%
+      Modulo 5: 10%
+
+  Participacion: 100% (10 integrantes).
+
+
+================================================================================
+BITACORA 5 - 14 de mayo de 2026
+================================================================================
+
+  Fecha: 14 de mayo de 2026
+  Tema: Casos de uso, casos de prueba y avance de modulos
+
+  Desarrollo de la reunion:
+    Se disenaron los casos de uso principales del sistema y se redactaron
+    los primeros casos de prueba. Cada subgrupo continuo con el desarrollo
+    de sus modulos.
+
+  Acuerdos:
+    - Casos de uso definidos: CU01 (Login), CU02 (Gestion Proyectos),
+      CU03 (Inscripcion), CU04 (Registro Horas).
+    - Plan de pruebas inicial con 24 casos de prueba.
+    - Avance por modulo:
+      Modulo 1: 50%
+      Modulo 2: 70%
+      Modulo 3: 10%
+      Modulo 4: 10%
+      Modulo 5: 10%
+
+  Participacion: 100% (10 integrantes).
+
+
+================================================================================
+BITACORA 6 - 10 de junio de 2026
+================================================================================
+
+  Fecha: 10 de junio de 2026
+  Tema: Conexion a base de datos y avance de modulos
+
+  Desarrollo de la reunion:
+    Se implemento la conexion a MySQL via PDO con prepared statements.
+    Se continuo el desarrollo de los modulos y se actualizaron los casos
+    de uso y pruebas.
+
+  Acuerdos:
+    - Conexion PDO implementada en backend/config/database.php.
+    - Cada subgrupo reporto avance de sus modulos.
+    - Se detecto que Jhon Intriago (Modulo 4) se retiro del grupo.
+    - Avance por modulo:
+      Modulo 1: 70%
+      Modulo 2: 70%
+      Modulo 3: 10%
+      Modulo 4: 10%
+      Modulo 5: 10%
+
+  Participacion: 90% (9 integrantes - Jhon Intriago retirado).
+
+
+================================================================================
+BITACORA 7 - 5 de julio de 2026
+================================================================================
+
+  Fecha: 5 de julio de 2026
+  Tema: Desarrollo completo de los 5 modulos y documentacion actualizada
+
+  Desarrollo de la reunion:
+    Se realizo una reunion de revision integral del proyecto. Todos los modulos
+    fueron completados y se probaron las funcionalidades principales. Se
+    actualizaron los documentos de requerimientos, diseno detallado y plan
+    de pruebas.
+
+  Logros alcanzados:
+    - Modulo 1 (Seguridad): Completado. Login con JWT, AuthGuard, RoleGuard,
+      interceptor HTTP, sesion persistente.
+
+    - Modulo 2 (Proyectos): Completado. CRUD completo con validaciones,
+      busqueda, paginacion, fechas de inicio/fin, detalle expandible,
+      sacar estudiante.
+
+    - Modulo 3 (Inscripcion): Completado. Flujo de solicitudes con
+      aceptar/denegar, control de cupos via transacciones MySQL,
+      regla de un proyecto por estudiante.
+
+    - Modulo 4 (Horas): Completado. Registro de horas por estudiantes,
+      aprobacion/rechazo por tutores, actividades con titulo, resumen
+      y historial.
+
+    - Modulo 5 (Dashboard): Completado. Paneles personalizados por rol
+      con graficos de barras CSS, barras de progreso, saludo temporal.
+
+  Documentacion actualizada:
+    - Requerimientos: 16 RF + 6 RNF (actualizados desde los 7 RF + 5 RNF).
+    - Diseno Detallado: 8 casos de uso (desde 4), 8 tablas (desde 7).
+    - Plan de Pruebas: 62 casos de prueba (desde 24).
+    - Manual de Usuario: Nuevo documento para los 3 roles.
+    - Articulo: Secciones de Resultados, Discusion, Conclusion y Referencias
+      completadas.
+
+  Avance por modulo:
+    Modulo 1: 100%
+    Modulo 2: 100%
+    Modulo 3: 100%
+    Modulo 4: 100%
+    Modulo 5: 100%
+
+  Participacion: 90% (9 integrantes).
+
+
+================================================================================
+BITACORA 8 - 18 de julio de 2026
+================================================================================
+
+  Fecha: 18 de julio de 2026
+  Tema: Entrega final de documentacion y revision completa del proyecto
+
+  Desarrollo de la reunion:
+    Se realizo la ultima reunion del proyecto para revisar y validar toda la
+    documentacion generada. Se verifico que todos los modulos funcionen
+    correctamente y se prepararon los archivos finales para la entrega.
+
+  Documentacion final generada:
+    1. Guia de Instalacion (actualizada con paso de base de datos).
+    2. Diagrama Entidad-Relacion (8 tablas actualizadas).
+    3. Requerimientos Funcionales y No Funcionales (16 RF + 6 RNF).
+    4. Diseno Detallado (8 modulos, 8 casos de uso, 8 tablas).
+    5. Plan de Pruebas (62 casos de prueba por modulo).
+    6. Manual de Usuario (Coordinador, Tutor, Estudiante).
+    7. Articulo Tecnico (completo con Resultados, Conclusiones, Referencias).
+    8. Bitacoras (8 entradas actualizadas).
+
+  Funcionalidades validadas:
+    - Login con 3 roles y JWT.
+    - CRUD de proyectos con validaciones y paginacion.
+    - Inscripcion con control de cupos y duplicados.
+    - Aceptacion/denegacion de solicitudes.
+    - CRUD de actividades del tutor.
+    - Registro y aprobacion de horas.
+    - CRUD de usuarios (Coordinador).
+    - Perfil y cambio de contrasena.
+    - Dashboard con graficos por rol.
+    - Busqueda en tablas de proyectos, solicitudes y horas.
+    - Filtro de proyectos y solicitudes por tutor.
+
+  Acuerdos:
+    - Todos los archivos .txt estan en la carpeta docs/.
+    - Los archivos .docx se actualizaran con el contenido de los .txt.
+    - El repositorio contiene todo el codigo fuente funcional.
+
+  Participacion: 90% (9 integrantes).
+
+
+================================================================================
+ RESUMEN DE AVANCE DEL PROYECTO
+================================================================================
+
+  Bitacora  Fecha          Avance Promedio  Integrantes
+  --------  -------------  ---------------  -----------
+  1         06-mayo-2026   0%               10
+  2         08-mayo-2026   0%               10
+  3         11-mayo-2026   10%              10
+  4         12-mayo-2026   20%              10
+  5         14-mayo-2026   30%              10
+  6         10-junio-2026  35%              9
+  7         05-julio-2026  95%              9
+  8         18-julio-2026  100%             9
+
+================================================================================
+ Fin de las Bitacoras
+================================================================================
