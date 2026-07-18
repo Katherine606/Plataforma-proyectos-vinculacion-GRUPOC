@@ -1,6 +1,6 @@
 # Plataforma de Gestión de Proyectos de Vinculación
 
-## Descripción General
+## 1. Descripción General
 
 La presente guía tiene como objetivo detallar el procedimiento necesario para descargar, configurar y ejecutar el proyecto **“Plataforma de Gestión de Proyectos de Vinculación”**.
 
@@ -10,18 +10,24 @@ El sistema fue desarrollado utilizando una arquitectura **MVC (Modelo Vista Cont
 - PHP para el backend
 - MySQL como gestor de base de datos
 
-# Requisitos Previos
+# 2. REQUISITOS PREVIOS
 
 Antes de ejecutar el sistema es necesario instalar las siguientes herramientas:
 
-- Git
-- Node.js
-- Angular CLI
-- XAMPP
-- Visual Studio Code
+  - Git (https://git-scm.com/)
+  - Node.js v18+ (https://nodejs.org/)
+  - Angular CLI (se instala en el paso 4)
+  - XAMPP (https://www.apachefriends.org/) - incluye MySQL y PHP
+  - Visual Studio Code (https://code.visualstudio.com/)
+
+Verificar las instalaciones abriendo una terminal y ejecutando:
+
+  git --version
+  node --version
+  npm --version
 
 
-# 1. Descargar el Proyecto desde GitHub
+# 3. DESCARGAR EL PROYECTO DESDE GITHUB
 
 Abrir CMD o PowerShell y ejecutar:
 
@@ -35,24 +41,16 @@ Ingresar a la carpeta del proyecto:
 ```bash
 cd Plataforma-proyectos-vinculacion-GRUPOC
 ```
-# 2. Abrir el Proyecto en Visual Studio Code y abrir la terminal
-Abrir Visual Studio Code.
+# 4. ABRIR EL PROYECTO EN VISUAL STUDIO CODE
 
-Buscar y abrir la carpeta: Plataforma-proyectos-vinculacion-GRUPOC
+  - Abrir Visual Studio Code.
+  - Buscar y abrir la carpeta: Plataforma-proyectos-vinculacion-GRUPOC
+  - Verificar que existan las siguientes carpetas: frontend, backend, database, docs
+  - Dentro de Visual Studio Code abrir una nueva terminal:
+    Terminal > New Terminal
+  - La terminal aparecera en la parte inferior del IDE.
 
-Verificar que existan las siguientes carpetas:
-frontend
-backend
-database
-docs
-
-Dentro de Visual Studio Code abrir una nueva terminal
-
-+ Terminal → New Terminal
-
-La terminal aparecerá en la parte inferior del IDE.
-
-# 3. Configuración Inicial de PowerShell (Solo la Primera Vez)
+# 5. CONFIGURACION INICIAL DE POWERSHELL (Solo la Primera Vez)
 
 En algunos equipos Windows, PowerShell bloquea la ejecución de scripts de Node.js.
 
@@ -70,7 +68,7 @@ y presionar Enter.
 
 Cerrar y volver a abrir Visual Studio Code.
 
-# 4. Instalación y Ejecución del Frontend
+# 6. Instalación y Ejecución del Frontend
 
 En la terminal ejecutar:
 ```bash
@@ -99,7 +97,51 @@ ng serve
 
 Abrir en el navegador: http://localhost:4200
 
-# 5. Ejecución del Backend
+# 6. CONFIGURACION DE LA BASE DE DATOS (OBLIGATORIO)
+
+6.1 Iniciar Apache y MySQL en XAMPP
+
+  - Abrir el Panel de Control de XAMPP.
+  - Iniciar el servicio Apache.
+  - Iniciar el servicio MySQL.
+
+6.2 Crear la base de datos
+
+  Abrir phpMyAdmin en el navegador: http://localhost/phpmyadmin
+
+  Opcion A - Importar desde el archivo SQL completo (recomendado):
+
+  - Pestaña "Importar" > "Seleccionar archivo"
+  - Seleccionar el archivo: base/vinculacion_db
+  - Hacer clic en "Continuar" / "Go"
+
+  Opcion B - Crear manualmente y ejecutar migraciones:
+
+  Paso 1: Crear la base de datos
+    En la pestaña "SQL" ejecutar:
+      CREATE DATABASE vinculacion_db
+      CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+  Paso 2: Importar el esquema principal
+    Pestaña "Importar" > seleccionar: database/schema.sql > Ejecutar
+
+  Paso 3: Ejecutar las migraciones en orden
+    Importar la base: "vinculacion_db"
+
+6.3 Credenciales de base de datos
+
+  El backend se conecta automaticamente con estos parametros (config/database.php):
+    Servidor:  localhost
+    Puerto:    3306
+    Usuario:   root
+    Contrasena: (vacia)
+    Base:      vinculacion_db
+
+  NOTA: Estas son las credenciales por defecto de XAMPP. Si cambiaste la
+  contrasena de root, edita el archivo backend/config/database.php.
+
+
+# 7. EJECUTAR EL BACKEND
 
 Abrir una nueva terminal dentro de Visual Studio Code.
 
@@ -121,7 +163,7 @@ C:\xampp\php\php.exe -S localhost:8000
 
 Si la ejecución es correcta aparecerá: PHP Development Server started
 
-# 6. Verificación del Backend
+# 8. VERIFICACION DEL BACKEND
 
 Abrir en el navegador:
 
@@ -129,12 +171,41 @@ http://localhost:8000/index.php?recurso=proyectos
 
 Si el backend funciona correctamente se mostrará información JSON correspondiente a los proyectos registrados.
 
-# 7. Base de Datos
+# 9. CREDENCIALES DE PRUEBA
 
-Actualmente el proyecto se encuentra en fase de diseño y estructuración de base de datos.
+  Usuario:               Contrasena:    Rol:
+  coordinador@ug.edu.ec  Coord123*      Coordinador
+  tutor@ug.edu.ec        Tutor123*      Tutor Academico
+  estudiante@ug.edu.ec   Est12345*      Estudiante
 
-Las tablas planteadas inicialmente son:
+ # 10. ESTRUCTURA DEL PROYECTO
 
-roles, usuarios, facultades, carreras, proyectos, solicitudes y horas_vinculacion
+  Plataforma-proyectos-vinculacion-GRUPOC/
+  |
+  |-- base/
+  |   |-- vinculacion_db            (Dump SQL completo con datos de prueba)
+  |
+  |-- database/
+  |   |-- schema.sql                (Esquema principal de tablas)
+  |   |-- migrate_tablas_faltantes.sql  (Migracion: actividades + horas)
+  |   |-- fix_enum_estados.sql      (Correccion de ENUMs)
+  |   |-- add_titulo_actividad.sql  (Columna titulo en actividades)
+  |
+  |-- frontend/                     (Angular 21 - SPA)
+  |   |-- src/app/
+  |       |-- components/           (13 componentes standalone)
+  |       |-- services/             (4 servicios HTTP)
+  |       |-- guards/               (AuthGuard + RoleGuard)
+  |       |-- interceptors/         (JWT interceptor)
+  |       |-- models/               (Interfaces TypeScript)
+  |
+  |-- backend/                      (PHP 8.0 - API REST)
+  |   |-- index.php                 (Router principal)
+  |   |-- config/                   (database.php + JwtHelper.php)
+  |   |-- controllers/              (9 controladores)
+  |   |-- models/dao/               (6 DAOs)
+  |   |-- models/dto/               (5 DTOs)
+  |
+  |-- docs/                         (Documentacion del proyecto)
 
-La implementación física en MySQL será desarrollada en fases posteriores del proyecto.
+
