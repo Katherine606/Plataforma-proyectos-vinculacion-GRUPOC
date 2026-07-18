@@ -31,6 +31,13 @@ class ProyectoDAO
         return $stmt->fetchAll();
     }
 
+    public function listarPorTutor(int $tutorId): array
+    {
+        $stmt = $this->db->prepare(self::SELECT_CON_JOINS . " WHERE p.tutor_id = :tid ORDER BY p.nombre");
+        $stmt->execute([':tid' => $tutorId]);
+        return $stmt->fetchAll();
+    }
+
     public function obtenerPorId(int $id): ?array
     {
         $stmt = $this->db->prepare(self::SELECT_CON_JOINS . " WHERE p.id_proyecto = :id");
@@ -41,23 +48,25 @@ class ProyectoDAO
     public function insertar(array $data): int
     {
         $stmt = $this->db->prepare("
-            INSERT INTO proyectos (nombre, descripcion, tutor_id, facultad_id, carrera_id, cupos_max, cupos_usados, estado)
-            VALUES (:nombre, :descripcion, :tutor_id, :facultad_id, :carrera_id, :cupos_max, 0, 'activo')
+            INSERT INTO proyectos (nombre, descripcion, tutor_id, facultad_id, carrera_id, cupos_max, cupos_usados, estado, fecha_inicio, fecha_fin)
+            VALUES (:nombre, :descripcion, :tutor_id, :facultad_id, :carrera_id, :cupos_max, 0, 'activo', :fecha_inicio, :fecha_fin)
         ");
         $stmt->execute([
-            ':nombre'      => $data['nombre'],
-            ':descripcion' => $data['descripcion'],
-            ':tutor_id'    => $data['tutor_id'],
-            ':facultad_id' => $data['facultad_id'],
-            ':carrera_id'  => $data['carrera_id'],
-            ':cupos_max'   => min((int) $data['cupos_max'], 60),
+            ':nombre'       => $data['nombre'],
+            ':descripcion'  => $data['descripcion'],
+            ':tutor_id'     => $data['tutor_id'],
+            ':facultad_id'  => $data['facultad_id'],
+            ':carrera_id'   => $data['carrera_id'],
+            ':cupos_max'    => min((int) $data['cupos_max'], 60),
+            ':fecha_inicio' => !empty($data['fecha_inicio']) ? $data['fecha_inicio'] : null,
+            ':fecha_fin'    => !empty($data['fecha_fin']) ? $data['fecha_fin'] : null,
         ]);
         return (int) $this->db->lastInsertId();
     }
 
     public function actualizar(int $id, array $data): bool
     {
-        $camposPermitidos = ['nombre', 'descripcion', 'tutor_id', 'facultad_id', 'carrera_id', 'cupos_max', 'estado'];
+        $camposPermitidos = ['nombre', 'descripcion', 'tutor_id', 'facultad_id', 'carrera_id', 'cupos_max', 'estado', 'fecha_inicio', 'fecha_fin'];
         $sets   = [];
         $params = [':id' => $id];
 

@@ -7,6 +7,9 @@
  * ====================================================================
  */
 
+error_reporting(E_ERROR | E_PARSE);
+ini_set('display_errors', 0);
+
 // ─── CORS ─────────────────────────────────────────────────────────────────────
 header('Access-Control-Allow-Origin: http://localhost:4200');
 header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
@@ -40,6 +43,8 @@ require_once __DIR__ . '/controllers/HoraController.php';
 require_once __DIR__ . '/controllers/DashboardController.php';
 require_once __DIR__ . '/controllers/CatalogoController.php';
 require_once __DIR__ . '/controllers/ActividadController.php';
+require_once __DIR__ . '/controllers/PerfilController.php';
+require_once __DIR__ . '/controllers/UsuariosController.php';
 
 // ─── HELPERS ──────────────────────────────────────────────────────────────────
 $jwtSecret = 'CAMBIAR_ESTA_LLAVE_EN_PRODUCCION_2026';
@@ -173,8 +178,35 @@ $payload = autenticarOrFail();
 if ($recurso === 'proyectos') {
     $ctrl = new ProyectoController();
 
-    if ($metodo === 'GET' && $accion === '') {
+    if ($metodo === 'GET' && $accion === '' && $id === null) {
+        $rolLower = strtolower($payload['rol'] ?? '');
+        if (str_contains($rolLower, 'tutor')) {
+            $userId = (int) $payload['sub'];
+            $dao = new ProyectoDAO();
+            $filas = $dao->listarPorTutor($userId);
+            $resultado = array_map(fn($row) => ProyectoDTO::desdeRegistro($row)->toArray(), $filas);
+            jsonResponse($resultado, 200);
+        }
         $r = $ctrl->listar();
+        jsonResponse($r['body'], $r['status']);
+    }
+
+    if ($metodo === 'GET' && $accion === 'tutor' && $id === null) {
+        autorizarRolOrFail($payload, ['Tutor'], 'Ver mis proyectos');
+        $userId = (int) $payload['sub'];
+        $dao = new ProyectoDAO();
+        $filas = $dao->listarPorTutor($userId);
+        $resultado = array_map(fn($row) => ProyectoDTO::desdeRegistro($row)->toArray(), $filas);
+        jsonResponse($resultado, 200);
+    }
+
+    if ($metodo === 'GET' && $accion === '' && $id !== null) {
+        $r = $ctrl->detalle($id);
+        jsonResponse($r['body'], $r['status']);
+    }
+
+    if ($metodo === 'GET' && $accion === 'detalle' && $id !== null) {
+        $r = $ctrl->detalle($id);
         jsonResponse($r['body'], $r['status']);
     }
 
@@ -184,9 +216,15 @@ if ($recurso === 'proyectos') {
         jsonResponse($r['body'], $r['status']);
     }
 
-    if ($metodo === 'PUT' && $id !== null) {
+    if ($metodo === 'PUT' && $id !== null && $accion === '') {
         autorizarRolOrFail($payload, ['Coordinador'], 'Editar proyecto');
         $r = $ctrl->actualizar($id, getJsonBody());
+        jsonResponse($r['body'], $r['status']);
+    }
+
+    if ($metodo === 'PUT' && $accion === 'sacar-estudiante' && $id !== null) {
+        autorizarRolOrFail($payload, ['Coordinador'], 'Remover estudiante');
+        $r = $ctrl->sacarEstudiante($id);
         jsonResponse($r['body'], $r['status']);
     }
 
@@ -204,7 +242,9 @@ if ($recurso === 'solicitudes') {
     $ctrl = new SolicitudController();
 
     if ($metodo === 'GET' && $accion === '') {
-        $r = $ctrl->listar();
+        $rolLower = strtolower($payload['rol'] ?? '');
+        $tutorId = str_contains($rolLower, 'tutor') ? (int) $payload['sub'] : null;
+        $r = $ctrl->listar($tutorId);
         jsonResponse($r['body'], $r['status']);
     }
 
@@ -272,6 +312,20 @@ if ($recurso === 'actividades') {
         jsonResponse($r['body'], $r['status']);
     }
 
+    if ($metodo === 'GET' && $accion === 'detalle') {
+        autorizarRolOrFail($payload, ['Tutor'], 'Detalle actividades');
+        $userId = (int) $payload['sub'];
+        $r = $ctrl->detalleTutor($userId);
+        jsonResponse($r['body'], $r['status']);
+    }
+
+    if ($metodo === 'GET' && $accion === 'estudiantes' && $id !== null) {
+        autorizarRolOrFail($payload, ['Tutor'], 'Ver estudiantes en actividad');
+        $userId = (int) $payload['sub'];
+        $r = $ctrl->estudiantesEnActividad($id, $userId);
+        jsonResponse($r['body'], $r['status']);
+    }
+
     if ($metodo === 'POST' && $accion === '') {
         autorizarRolOrFail($payload, ['Tutor'], 'Crear actividad');
         $userId = (int) $payload['sub'];
@@ -297,6 +351,70 @@ if ($recurso === 'dashboard') {
         jsonResponse($r['body'], $r['status']);
     }
     jsonResponse(['error' => 'Endpoint de dashboard no encontrado'], 404);
+}
+
+// PERFIL — datos del usuario + cambio de contraseña
+if ($recurso === 'perfil') {
+    $ctrl = new PerfilController();
+
+    if ($metodo === 'GET' && $accion === '') {
+        $r = $ctrl->obtener($payload);
+        jsonResponse($r['body'], $r['status']);
+    }
+
+    if ($metodo === 'PUT' && $accion === 'password') {
+        $r = $ctrl->cambiarPassword($payload, getJsonBody());
+        jsonResponse($r['body'], $r['status']);
+    }
+
+    jsonResponse(['error' => 'Endpoint de perfil no encontrado'], 404);
+}
+
+// USUARIOS — CRUD solo Coordinador
+if ($recurso === 'usuarios') {
+    autorizarRolOrFail($payload, ['Coordinador'], 'Gestionar usuarios');
+    $ctrl = new UsuariosController();
+
+    if ($metodo === 'GET' && $accion === '' && $id === null) {
+        $r = $ctrl->listar();
+        jsonResponse($r['body'], $r['status']);
+    }
+
+    if ($metodo === 'GET' && $accion === 'roles') {
+        $r = $ctrl->roles();
+        jsonResponse($r['body'], $r['status']);
+    }
+
+    if ($metodo === 'POST' && $accion === '') {
+        $r = $ctrl->crear(getJsonBody());
+        jsonResponse($r['body'], $r['status']);
+    }
+
+    if ($metodo === 'PUT' && $id !== null && $accion === 'toggle-estado') {
+        $r = $ctrl->toggleEstado($id);
+        jsonResponse($r['body'], $r['status']);
+    }
+
+    if ($metodo === 'PUT' && $id !== null && $accion === '') {
+        $r = $ctrl->actualizar($id, getJsonBody());
+        jsonResponse($r['body'], $r['status']);
+    }
+
+    if ($metodo === 'DELETE' && $id !== null) {
+        $r = $ctrl->eliminar($id);
+        jsonResponse($r['body'], $r['status']);
+    }
+
+    jsonResponse(['error' => 'Endpoint de usuarios no encontrado'], 404);
+}
+
+// ROLES — catálogo para el form de usuarios
+if ($recurso === 'roles') {
+    autorizarRolOrFail($payload, ['Coordinador'], 'Ver roles');
+    if ($metodo === 'GET') {
+        $dao = new UsuarioDAO();
+        jsonResponse($dao->listarRoles(), 200);
+    }
 }
 
 // ─── RECURSO NO ENCONTRADO ────────────────────────────────────────────────────

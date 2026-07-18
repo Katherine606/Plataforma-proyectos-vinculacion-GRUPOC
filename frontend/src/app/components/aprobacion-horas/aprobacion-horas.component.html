@@ -10,6 +10,11 @@
 
 <p *ngIf="cargando" style="color:#94a3b8;">Cargando registros...</p>
 
+<div class="search-bar" *ngIf="!cargando">
+  <input type="text" [(ngModel)]="buscarTexto" (input)="aplicarFiltro()"
+         placeholder="Buscar por estudiante, proyecto o descripcion..." class="search-input">
+</div>
+
 <!-- Horas pendientes -->
 <h2 *ngIf="!cargando && horasPendientes.length > 0" class="section-title">
   Pendientes de revisión ({{ horasPendientes.length }})

@@ -1,70 +1,122 @@
-<h1>Crear Actividad del Día</h1>
+<h1>Actividades</h1>
 
-<div *ngIf="exitoMsg" class="alert-success">
-  {{ exitoMsg }}
-</div>
+<div *ngIf="exitoMsg" class="alert-success">{{ exitoMsg }}</div>
+<div *ngIf="errorMsg" class="alert-error">{{ errorMsg }}</div>
 
-<div *ngIf="errorMsg" class="alert-error">
-  {{ errorMsg }}
-</div>
-
-<form [formGroup]="form" (ngSubmit)="onSubmit()">
-
-  <div class="form-group">
-    <label for="proyecto_id">Proyecto</label>
-    <select id="proyecto_id" formControlName="proyecto_id">
-      <option [ngValue]="null">-- Seleccionar proyecto --</option>
-      <option *ngFor="let p of proyectos" [ngValue]="p.id">{{ p.nombre }}</option>
-    </select>
-    <span class="error-msg" *ngIf="form.get('proyecto_id')?.touched && form.get('proyecto_id')?.errors?.['required']">
-      Selecciona un proyecto.
-    </span>
-  </div>
-
-  <div class="form-group">
-    <label for="fecha">Fecha de la actividad</label>
-    <input type="date" id="fecha" formControlName="fecha" [max]="hoy()">
-    <span class="error-msg" *ngIf="form.get('fecha')?.touched && form.get('fecha')?.errors?.['required']">
-      La fecha es obligatoria.
-    </span>
-  </div>
-
-  <div class="form-group">
-    <label for="descripcion">Descripción de la actividad</label>
-    <textarea id="descripcion" formControlName="descripcion" rows="4"
-              placeholder="Describe la actividad que se realizará..."></textarea>
-    <span class="error-msg" *ngIf="form.get('descripcion')?.touched && form.get('descripcion')?.errors?.['minlength']">
-      Mínimo 5 caracteres.
-    </span>
-  </div>
-
-  <div class="form-actions">
+<!-- FORMULARIO CREAR -->
+<div class="crear-box">
+  <h3>Crear nueva actividad</h3>
+  <form [formGroup]="form" (ngSubmit)="onSubmit()">
+    <div class="form-row">
+      <div class="form-group">
+        <label>Proyecto</label>
+        <select formControlName="proyecto_id" [class.input-error]="form.get('proyecto_id')?.touched && form.get('proyecto_id')?.invalid">
+          <option [ngValue]="null">-- Seleccionar --</option>
+          <option *ngFor="let p of proyectos" [ngValue]="p.id">{{ p.nombre }}</option>
+        </select>
+        <span class="error-msg" *ngIf="form.get('proyecto_id')?.touched && form.get('proyecto_id')?.errors?.['required']">
+          Selecciona un proyecto.
+        </span>
+      </div>
+      <div class="form-group">
+        <label>Fecha</label>
+        <input type="date" formControlName="fecha" [max]="hoy()" [class.input-error]="form.get('fecha')?.touched && form.get('fecha')?.invalid">
+        <span class="error-msg" *ngIf="form.get('fecha')?.touched && form.get('fecha')?.errors?.['required']">
+          La fecha es obligatoria.
+        </span>
+      </div>
+    </div>
+    <div class="form-group">
+      <label>T&iacute;tulo</label>
+      <input type="text" formControlName="titulo" placeholder="Titulo de la actividad" maxlength="200"
+             [class.input-error]="form.get('titulo')?.touched && form.get('titulo')?.invalid">
+      <span class="error-msg" *ngIf="form.get('titulo')?.touched && form.get('titulo')?.errors?.['required']">
+        El titulo es obligatorio.
+      </span>
+      <span class="error-msg" *ngIf="form.get('titulo')?.touched && form.get('titulo')?.errors?.['minlength']">
+        Minimo 3 caracteres.
+      </span>
+    </div>
+    <div class="form-group">
+      <label>Descripci&oacute;n</label>
+      <textarea formControlName="descripcion" rows="3" placeholder="Describe la actividad..."
+                [class.input-error]="form.get('descripcion')?.touched && form.get('descripcion')?.invalid"></textarea>
+      <span class="error-msg" *ngIf="form.get('descripcion')?.touched && form.get('descripcion')?.errors?.['required']">
+        La descripcion es obligatoria.
+      </span>
+      <span class="error-msg" *ngIf="form.get('descripcion')?.touched && form.get('descripcion')?.errors?.['minlength']">
+        Minimo 5 caracteres.
+      </span>
+    </div>
     <button type="submit" class="btn" [disabled]="enviando">
       {{ enviando ? 'Creando...' : 'Crear Actividad' }}
     </button>
+  </form>
+</div>
+
+<!-- LISTA DE ACTIVIDADES -->
+<h2 *ngIf="actividades.length > 0" class="section-title">Actividades creadas ({{ actividades.length }})</h2>
+
+<div *ngIf="actividades.length === 0" class="empty-state">No has creado actividades a&uacute;n.</div>
+
+<div class="actividades-lista">
+  <div class="actividad-card" *ngFor="let a of actividades">
+    <div class="actividad-header" (click)="toggleEstudiantes(a)">
+      <div class="actividad-info">
+        <strong>{{ a.titulo || 'Sin titulo' }}</strong>
+        <div class="actividad-proyecto">{{ a.nombre_proyecto }}</div>
+        <div class="actividad-meta">{{ a.fecha }} &mdash; {{ a.descripcion }}</div>
+      </div>
+      <div class="actividad-stats">
+        <span class="stat-mini">
+          <span class="stat-mini-label">Horas aprobadas</span>
+          <span class="stat-mini-valor badge badge-aceptado">{{ a.horas_aprobadas }}</span>
+        </span>
+        <span class="stat-mini">
+          <span class="stat-mini-label">Pendientes</span>
+          <span class="stat-mini-valor badge badge-pendiente">{{ a.horas_pendientes }}</span>
+        </span>
+        <span class="stat-mini">
+          <span class="stat-mini-label">Registros</span>
+          <span class="stat-mini-valor badge badge-info">{{ a.total_registros }}</span>
+        </span>
+      </div>
+      <div class="actividad-actions">
+        <button class="btn-icon btn-delete" title="Eliminar" (click)="eliminar(a.id); $event.stopPropagation()">&#10005;</button>
+        <span class="expand-arrow" [class.expanded]="actividadExpandida === a.id">&#9660;</span>
+      </div>
+    </div>
+
+    <!-- Estudiantes expandible -->
+    <div class="actividad-estudiantes" *ngIf="actividadExpandida === a.id">
+      <p *ngIf="estudiantesCargando" class="loading-text">Cargando...</p>
+      <p *ngIf="!estudiantesCargando && (!estudiantesMap[a.id] || estudiantesMap[a.id].length === 0)"
+         class="empty-text">Ning&uacute;n estudiante ha registrado horas en esta actividad.</p>
+      <table *ngIf="!estudiantesCargando && estudiantesMap[a.id] && estudiantesMap[a.id]!.length > 0" class="tabla-estudiantes">
+        <thead>
+          <tr>
+            <th>Estudiante</th>
+            <th>Fecha</th>
+            <th>Horas</th>
+            <th>Estado</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let e of estudiantesMap[a.id]!">
+            <td><strong>{{ e.estudiante }}</strong></td>
+            <td>{{ e.fecha_actividad }}</td>
+            <td>{{ e.horas }}</td>
+            <td>
+              <span class="badge"
+                    [class.badge-aceptado]="e.estado === 'aprobada'"
+                    [class.badge-pendiente]="e.estado === 'pendiente'"
+                    [class.badge-denegado]="e.estado === 'rechazada'">
+                {{ e.estado }}
+              </span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </div>
-
-</form>
-
-<h2 *ngIf="actividades.length > 0" class="section-title">Actividades creadas</h2>
-
-<table *ngIf="actividades.length > 0">
-  <thead>
-    <tr>
-      <th>Fecha</th>
-      <th>Proyecto</th>
-      <th>Descripción</th>
-      <th>Acciones</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr *ngFor="let a of actividades">
-      <td>{{ a.fecha }}</td>
-      <td>{{ a.nombre_proyecto }}</td>
-      <td>{{ a.descripcion }}</td>
-      <td>
-        <button class="btn btn-denegar" style="padding:6px 12px; font-size:12px;" (click)="eliminar(a.id)">Eliminar</button>
-      </td>
-    </tr>
-  </tbody>
-</table>
+</div>

@@ -1,5 +1,6 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { HttpErrorResponse } from '@angular/common/http';
 import { ProyectoService } from '../../services/proyecto.service';
 import { Solicitud } from '../../models/proyecto.model';
@@ -8,17 +9,19 @@ import { AuthService } from '../../services/auth.service';
 @Component({
   selector: 'app-solicitudes',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './solicitudes.component.html',
   styleUrl: './solicitudes.component.css'
 })
 export class SolicitudesComponent implements OnInit {
 
+  todasLasSolicitudes: Solicitud[] = [];
   solicitudes: Solicitud[] = [];
   cargando = true;
   rol = '';
   canManageSolicitudes = false;
   errorMsg = '';
+  buscarTexto = '';
 
   constructor(
     private proyectoService: ProyectoService,
@@ -38,7 +41,8 @@ export class SolicitudesComponent implements OnInit {
     this.errorMsg = '';
     this.proyectoService.getSolicitudes().subscribe({
       next: (data) => {
-        this.solicitudes = data;
+        this.todasLasSolicitudes = data;
+        this.aplicarFiltro();
         this.cargando = false;
         this.cdr.detectChanges();
       },
@@ -51,6 +55,20 @@ export class SolicitudesComponent implements OnInit {
         this.cdr.detectChanges();
       }
     });
+  }
+
+  aplicarFiltro(): void {
+    const texto = this.buscarTexto.toLowerCase().trim();
+    if (!texto) {
+      this.solicitudes = this.todasLasSolicitudes;
+    } else {
+      this.solicitudes = this.todasLasSolicitudes.filter(s =>
+        s.estudiante.toLowerCase().includes(texto) ||
+        s.nombre_proyecto.toLowerCase().includes(texto) ||
+        s.estado.toLowerCase().includes(texto)
+      );
+    }
+    this.cdr.detectChanges();
   }
 
   get pendientes(): Solicitud[] {

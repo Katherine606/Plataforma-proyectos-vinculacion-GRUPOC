@@ -13,6 +13,7 @@ class ActividadDAO
                p.nombre as nombre_proyecto,
                a.tutor_id as id_tutor,
                CONCAT(t.nombre, ' ', t.apellido) as tutor,
+               a.titulo,
                a.fecha,
                a.descripcion,
                a.created_at
@@ -49,14 +50,15 @@ class ActividadDAO
     public function insertar(array $data): int
     {
         $stmt = $this->db->prepare("
-            INSERT INTO actividades (proyecto_id, tutor_id, fecha, descripcion)
-            VALUES (:pid, :tid, :fecha, :desc)
+            INSERT INTO actividades (proyecto_id, tutor_id, titulo, fecha, descripcion)
+            VALUES (:pid, :tid, :titulo, :fecha, :desc)
         ");
         $stmt->execute([
-            ':pid'   => $data['proyecto_id'],
-            ':tid'   => $data['tutor_id'],
-            ':fecha' => $data['fecha'],
-            ':desc'  => $data['descripcion'],
+            ':pid'    => $data['proyecto_id'],
+            ':tid'    => $data['tutor_id'],
+            ':titulo' => $data['titulo'] ?? '',
+            ':fecha'  => $data['fecha'],
+            ':desc'   => $data['descripcion'],
         ]);
         return (int) $this->db->lastInsertId();
     }
@@ -66,5 +68,43 @@ class ActividadDAO
         $stmt = $this->db->prepare("DELETE FROM actividades WHERE id_actividad = :id AND tutor_id = :tid");
         $stmt->execute([':id' => $id, ':tid' => $tutorId]);
         return $stmt->rowCount() > 0;
+    }
+
+    public function detallePorTutor(int $tutorId): array
+    {
+        $stmt = $this->db->prepare("
+            SELECT a.id_actividad as id,
+                   a.fecha,
+                   a.titulo,
+                   a.descripcion,
+                   p.nombre as nombre_proyecto,
+                   p.id_proyecto as id_proyecto,
+                   (SELECT COUNT(*) FROM horas_vinculacion h WHERE h.actividad_id = a.id_actividad) as total_registros,
+                   (SELECT COALESCE(SUM(h.horas), 0) FROM horas_vinculacion h WHERE h.actividad_id = a.id_actividad AND h.estado = 'aprobada') as horas_aprobadas,
+                   (SELECT COALESCE(SUM(h.horas), 0) FROM horas_vinculacion h WHERE h.actividad_id = a.id_actividad AND h.estado = 'pendiente') as horas_pendientes
+            FROM actividades a
+            JOIN proyectos p ON a.proyecto_id = p.id_proyecto
+            WHERE a.tutor_id = :tid
+            ORDER BY a.fecha DESC, a.created_at DESC
+        ");
+        $stmt->execute([':tid' => $tutorId]);
+        return $stmt->fetchAll();
+    }
+
+    public function estudiantesPorActividad(int $actividadId): array
+    {
+        $stmt = $this->db->prepare("
+            SELECT CONCAT(u.nombre, ' ', u.apellido) as estudiante,
+                   h.fecha_actividad,
+                   h.horas,
+                   h.descripcion,
+                   h.estado
+            FROM horas_vinculacion h
+            JOIN usuarios u ON h.estudiante_id = u.id_usuario
+            WHERE h.actividad_id = :aid
+            ORDER BY h.fecha_actividad DESC
+        ");
+        $stmt->execute([':aid' => $actividadId]);
+        return $stmt->fetchAll();
     }
 }

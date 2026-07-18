@@ -75,4 +75,14 @@ export class ProyectoService {
   crearSolicitud(idProyecto: number): Observable<Solicitud> {
     return this.http.post<Solicitud>(`${this.apiUrl}?recurso=solicitudes`, { id_proyecto: idProyecto });
   }
+
+  /** Detalle de un proyecto con estudiantes inscritos */
+  getDetalleProyecto(id: number): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}?recurso=proyectos&id=${id}`);
+  }
+
+  /** Coordinador saca a un estudiante del proyecto */
+  sacarEstudiante(solicitudId: number): Observable<any> {
+    return this.http.put<any>(`${this.apiUrl}?recurso=proyectos&id=${solicitudId}&accion=sacar-estudiante`, {});
+  }
 }

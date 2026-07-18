@@ -2,7 +2,7 @@ import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { HttpErrorResponse, HttpClient } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { ProyectoService } from '../../services/proyecto.service';
 import { Proyecto } from '../../models/proyecto.model';
 import { AuthService } from '../../services/auth.service';
@@ -22,6 +22,7 @@ interface Tutor {
 })
 export class ListaProyectosComponent implements OnInit {
 
+  todosLosProyectos: Proyecto[] = [];
   proyectos: Proyecto[] = [];
   cargando = true;
   error = '';
@@ -30,6 +31,10 @@ export class ListaProyectosComponent implements OnInit {
   isEstudiante = false;
   isCoordinador = false;
 
+  buscarTexto = '';
+  paginaActual = 1;
+  porPagina = 8;
+
   modalAbierto = false;
   proyectoEditando: Proyecto | null = null;
   editNombre = '';
@@ -37,7 +42,10 @@ export class ListaProyectosComponent implements OnInit {
   editTutorId: number | null = null;
   editTutorBloqueado = true;
   editCuposMax: number = 0;
+  editFechaInicio = '';
+  editFechaFin = '';
   tutores: Tutor[] = [];
+  erroresEdicion: { [campo: string]: string } = {};
 
   private readonly apiUrl = 'http://localhost:8000/index.php';
 
@@ -64,11 +72,12 @@ export class ListaProyectosComponent implements OnInit {
     this.error = '';
     this.proyectoService.getProyectos().subscribe({
       next: (data) => {
-        this.proyectos = data;
+        this.todosLosProyectos = data;
+        this.aplicarFiltro();
         this.cargando = false;
         this.cdr.detectChanges();
       },
-      error: (err) => {
+      error: () => {
         this.error = 'No se pudo cargar la lista.';
         this.cargando = false;
         this.cdr.detectChanges();
@@ -79,20 +88,57 @@ export class ListaProyectosComponent implements OnInit {
   cargarTutores(): void {
     this.http.get<Tutor[]>(`${this.apiUrl}?recurso=tutores`).subscribe({
       next: (data) => { this.tutores = data; this.cdr.detectChanges(); },
-      error: () => console.error('Error al cargar tutores')
+      error: () => {}
     });
   }
 
-  getNombreTutor(tutorId: number): string {
-    const t = this.tutores.find(t => t.id === tutorId);
-    return t ? `${t.nombre} ${t.apellido}` : '';
+  // ─── BUSQUEDA / FILTRO ────────────────────────────────────────────────────
+  aplicarFiltro(): void {
+    const texto = this.buscarTexto.toLowerCase().trim();
+    let filtrados = this.todosLosProyectos;
+
+    if (texto) {
+      filtrados = filtrados.filter(p =>
+        p.nombre.toLowerCase().includes(texto) ||
+        p.tutor.toLowerCase().includes(texto) ||
+        p.facultad.toLowerCase().includes(texto) ||
+        p.carrera.toLowerCase().includes(texto) ||
+        p.descripcion.toLowerCase().includes(texto)
+      );
+    }
+
+    this.paginaActual = 1;
+    this.proyectos = filtrados;
+    this.cdr.detectChanges();
   }
 
+  get proyectosPaginados(): Proyecto[] {
+    const inicio = (this.paginaActual - 1) * this.porPagina;
+    return this.proyectos.slice(inicio, inicio + this.porPagina);
+  }
+
+  get totalPaginas(): number {
+    return Math.max(1, Math.ceil(this.proyectos.length / this.porPagina));
+  }
+
+  get paginasArray(): number[] {
+    const arr: number[] = [];
+    for (let i = 1; i <= this.totalPaginas; i++) arr.push(i);
+    return arr;
+  }
+
+  irPagina(p: number): void {
+    if (p >= 1 && p <= this.totalPaginas) {
+      this.paginaActual = p;
+    }
+  }
+
+  // ─── ACCIONES ─────────────────────────────────────────────────────────────
   inscribirse(proyecto: Proyecto): void {
     this.mensajeExito = '';
     this.error = '';
     this.proyectoService.crearSolicitud(proyecto.id).subscribe({
-      next: (res) => {
+      next: () => {
         this.mensajeExito = 'Solicitud enviada correctamente.';
         this.cdr.detectChanges();
       },
@@ -104,7 +150,7 @@ export class ListaProyectosComponent implements OnInit {
   }
 
   confirmarEliminar(p: Proyecto): void {
-    if (confirm(`¿Eliminar el proyecto "${p.nombre}"?`)) {
+    if (confirm(`Eliminar el proyecto "${p.nombre}"?`)) {
       this.proyectoService.eliminarProyecto(p.id).subscribe({
         next: () => this.cargar(),
         error: (err) => {
@@ -120,6 +166,8 @@ export class ListaProyectosComponent implements OnInit {
     this.editNombre = p.nombre;
     this.editDescripcion = p.descripcion;
     this.editCuposMax = p.cupos_max;
+    this.editFechaInicio = p.fecha_inicio ?? '';
+    this.editFechaFin = p.fecha_fin ?? '';
     const tutorEncontrado = this.tutores.find(
       t => `${t.nombre} ${t.apellido}` === p.tutor
     );
@@ -140,10 +188,20 @@ export class ListaProyectosComponent implements OnInit {
   guardarCambios(): void {
     if (!this.proyectoEditando) return;
     this.error = '';
+    this.erroresEdicion = {};
+
+    if (!this.editNombre.trim()) this.erroresEdicion['nombre'] = 'El nombre es obligatorio.';
+    if (!this.editDescripcion.trim()) this.erroresEdicion['descripcion'] = 'La descripcion es obligatoria.';
+    if (Object.keys(this.erroresEdicion).length > 0) {
+      this.cdr.detectChanges();
+      return;
+    }
 
     const datos: any = {
       nombre: this.editNombre,
       descripcion: this.editDescripcion,
+      fecha_inicio: this.editFechaInicio || null,
+      fecha_fin: this.editFechaFin || null,
     };
     if (this.editTutorId) {
       datos.tutor_id = this.editTutorId;
@@ -156,6 +214,54 @@ export class ListaProyectosComponent implements OnInit {
       },
       error: (err) => {
         this.error = err?.error?.error ?? 'No se pudieron guardar los cambios.';
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
+  // ─── DETALLE ──────────────────────────────────────────────────────────────
+  proyectoDetalle: any = null;
+  detalleCargando = false;
+
+  verDetalle(p: Proyecto): void {
+    if (this.proyectoDetalle?.proyecto?.id === p.id) {
+      this.cerrarDetalle();
+      return;
+    }
+    this.detalleCargando = true;
+    this.proyectoDetalle = null;
+    this.proyectoService.getDetalleProyecto(p.id).subscribe({
+      next: (data) => {
+        this.proyectoDetalle = data;
+        this.detalleCargando = false;
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        this.detalleCargando = false;
+        this.error = 'No se pudo cargar el detalle.';
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
+  cerrarDetalle(): void {
+    this.proyectoDetalle = null;
+  }
+
+  sacarEstudiante(solicitudId: number): void {
+    if (!confirm('Remover a este estudiante del proyecto?')) return;
+    this.proyectoService.sacarEstudiante(solicitudId).subscribe({
+      next: () => {
+        if (this.proyectoDetalle) {
+          this.proyectoService.getDetalleProyecto(this.proyectoDetalle.proyecto.id).subscribe({
+            next: (data) => { this.proyectoDetalle = data; this.cdr.detectChanges(); },
+            error: () => {}
+          });
+        }
+        this.cargar();
+      },
+      error: (err) => {
+        this.error = err?.error?.error ?? 'No se pudo remover al estudiante.';
         this.cdr.detectChanges();
       }
     });

@@ -30,6 +30,26 @@ class SolicitudDAO
         return $stmt->fetchAll();
     }
 
+    public function listarPorTutor(int $tutorId): array
+    {
+        $stmt = $this->db->prepare("
+            SELECT s.id_solicitud as id,
+                   CONCAT(e.nombre, ' ', e.apellido) as estudiante,
+                   e.correo as estudiante_email,
+                   s.proyecto_id as id_proyecto,
+                   p.nombre as nombre_proyecto,
+                   s.estado,
+                   s.fecha_solicitud
+            FROM solicitudes s
+            JOIN usuarios e ON s.estudiante_id = e.id_usuario
+            JOIN proyectos p ON s.proyecto_id = p.id_proyecto
+            WHERE p.tutor_id = :tid
+            ORDER BY s.fecha_solicitud DESC
+        ");
+        $stmt->execute([':tid' => $tutorId]);
+        return $stmt->fetchAll();
+    }
+
     public function verificarDuplicada(int $estudianteId, int $proyectoId): bool
     {
         $stmt = $this->db->prepare("
@@ -38,6 +58,16 @@ class SolicitudDAO
             AND estado IN ('pendiente', 'aceptada')
         ");
         $stmt->execute([':eid' => $estudianteId, ':pid' => $proyectoId]);
+        return $stmt->fetchColumn() > 0;
+    }
+
+    public function tieneProyectoActivo(int $estudianteId): bool
+    {
+        $stmt = $this->db->prepare("
+            SELECT COUNT(*) FROM solicitudes
+            WHERE estudiante_id = :eid AND estado = 'aceptada'
+        ");
+        $stmt->execute([':eid' => $estudianteId]);
         return $stmt->fetchColumn() > 0;
     }
 

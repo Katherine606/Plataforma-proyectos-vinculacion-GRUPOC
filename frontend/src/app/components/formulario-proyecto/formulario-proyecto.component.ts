@@ -54,12 +54,14 @@ export class FormularioProyectoComponent implements OnInit {
     private cdr: ChangeDetectorRef
   ) {
     this.form = this.fb.group({
-      nombre:      ['', [Validators.required, this.validarNombreConSentido]],
-      descripcion: ['', [Validators.required]],
-      facultad_id: [null, [Validators.required]],
-      carrera_id:  [null, [Validators.required]],
-      tutor_id:    [null, [Validators.required]],
-      cupos_max:   [null, [Validators.required, Validators.min(1), Validators.max(60)]]
+      nombre:       ['', [Validators.required, this.validarNombreConSentido]],
+      descripcion:  ['', [Validators.required]],
+      facultad_id:  [null, [Validators.required]],
+      carrera_id:   [null, [Validators.required]],
+      tutor_id:     [null, [Validators.required]],
+      cupos_max:    [null, [Validators.required, Validators.min(1), Validators.max(60)]],
+      fecha_inicio: [''],
+      fecha_fin:    ['']
     });
   }
 

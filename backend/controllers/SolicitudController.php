@@ -18,9 +18,11 @@ class SolicitudController
         $this->proyectoDAO  = new ProyectoDAO();
     }
 
-    public function listar(): array
+    public function listar(?int $tutorId = null): array
     {
-        $filas = $this->solicitudDAO->listar();
+        $filas = $tutorId
+            ? $this->solicitudDAO->listarPorTutor($tutorId)
+            : $this->solicitudDAO->listar();
         $resultado = array_map(fn($row) => SolicitudDTO::desdeRegistro($row)->toArray(), $filas);
         return ['status' => 200, 'body' => $resultado];
     }
@@ -46,6 +48,11 @@ class SolicitudController
         // Verificar duplicada
         if ($this->solicitudDAO->verificarDuplicada($estudianteId, $idProyecto)) {
             return ['status' => 400, 'body' => ['error' => 'Ya existe una solicitud abierta para este proyecto']];
+        }
+
+        // Un estudiante solo puede estar en 1 proyecto a la vez
+        if ($this->solicitudDAO->tieneProyectoActivo($estudianteId)) {
+            return ['status' => 400, 'body' => ['error' => 'Ya estás inscrito en un proyecto. Debes salir del actual primero.']];
         }
 
         // Crear solicitud con transacción
@@ -87,7 +94,11 @@ class SolicitudController
         $db = Database::getInstance()->getConnection();
         $db->beginTransaction();
         try {
-            $this->solicitudDAO->actualizarEstado($id, $nuevoEstado);
+            $ok = $this->solicitudDAO->actualizarEstado($id, $nuevoEstado);
+            if (!$ok) {
+                $db->rollBack();
+                return ['status' => 500, 'body' => ['error' => 'No se pudo actualizar el estado. Verifica el ENUM de la tabla solicitudes.']];
+            }
 
             if ($nuevoEstado === 'aceptada') {
                 if (!$this->proyectoDAO->incrementarCupos($solicitud['proyecto_id'])) {

@@ -35,11 +35,16 @@ class ActividadController
     public function crear(int $tutorId, array $body): array
     {
         $idProyecto  = isset($body['proyecto_id']) ? (int) $body['proyecto_id'] : 0;
+        $titulo      = trim($body['titulo'] ?? '');
         $fecha       = $body['fecha'] ?? '';
         $descripcion = trim($body['descripcion'] ?? '');
 
-        if ($idProyecto <= 0 || empty($fecha) || empty($descripcion)) {
+        if ($idProyecto <= 0 || empty($titulo) || empty($fecha) || empty($descripcion)) {
             return ['status' => 400, 'body' => ['error' => 'Todos los campos son obligatorios']];
+        }
+
+        if (strlen($titulo) > 200) {
+            return ['status' => 400, 'body' => ['error' => 'El titulo no puede exceder 200 caracteres']];
         }
 
         // Verificar que el proyecto pertenezca al tutor
@@ -51,6 +56,7 @@ class ActividadController
         $nuevoId = $this->dao->insertar([
             'proyecto_id' => $idProyecto,
             'tutor_id'    => $tutorId,
+            'titulo'      => $titulo,
             'fecha'       => $fecha,
             'descripcion' => $descripcion,
         ]);
@@ -58,6 +64,7 @@ class ActividadController
         return ['status' => 201, 'body' => [
             'id'          => $nuevoId,
             'proyecto_id' => $idProyecto,
+            'titulo'      => $titulo,
             'fecha'       => $fecha,
             'descripcion' => $descripcion,
         ]];
@@ -69,6 +76,18 @@ class ActividadController
             return ['status' => 404, 'body' => ['error' => 'Actividad no encontrada o sin permiso']];
         }
         return ['status' => 200, 'body' => ['ok' => true]];
+    }
+
+    public function detalleTutor(int $tutorId): array
+    {
+        $filas = $this->dao->detallePorTutor($tutorId);
+        return ['status' => 200, 'body' => $filas];
+    }
+
+    public function estudiantesEnActividad(int $actividadId, int $tutorId): array
+    {
+        $filas = $this->dao->estudiantesPorActividad($actividadId);
+        return ['status' => 200, 'body' => $filas];
     }
 
     private function obtenerProyectosAceptados(int $estudianteId): array

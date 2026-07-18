@@ -1,1 +1,176 @@
-/* Estilos definidos globalmente en styles.css */
+.crear-box {
+  padding: 24px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  margin-bottom: 32px;
+}
+
+.crear-box h3 {
+  font-size: 15px;
+  font-weight: 600;
+  color: #334155;
+  margin-bottom: 16px;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.actividades-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.actividad-card {
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  overflow: hidden;
+  transition: all 0.15s;
+}
+
+.actividad-card:hover {
+  border-color: #cbd5e1;
+}
+
+.actividad-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 20px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.actividad-header:hover {
+  background: #f8fafc;
+}
+
+.actividad-info {
+  flex: 1;
+}
+
+.actividad-info strong {
+  font-size: 14px;
+  color: #0f172a;
+}
+
+.actividad-proyecto {
+  font-size: 12px;
+  color: #7c3aed;
+  font-weight: 500;
+  margin-top: 2px;
+}
+
+.actividad-meta {
+  font-size: 12px;
+  color: #64748b;
+  margin-top: 2px;
+}
+
+.actividad-stats {
+  display: flex;
+  gap: 12px;
+}
+
+.stat-mini {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.stat-mini-label {
+  font-size: 9px;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.stat-mini-valor {
+  font-size: 12px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 6px;
+}
+
+.actividad-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  background: white;
+  cursor: pointer;
+  font-size: 12px;
+  transition: all 0.15s;
+}
+
+.btn-delete {
+  color: #dc2626;
+}
+
+.btn-delete:hover {
+  background: #fef2f2;
+  border-color: #dc2626;
+}
+
+.expand-arrow {
+  font-size: 10px;
+  color: #94a3b8;
+  transition: transform 0.2s;
+}
+
+.expand-arrow.expanded {
+  transform: rotate(180deg);
+}
+
+.actividad-estudiantes {
+  border-top: 1px solid #f1f5f9;
+  padding: 16px 20px;
+  background: #fafbfc;
+}
+
+.loading-text {
+  color: #94a3b8;
+  font-size: 13px;
+}
+
+.empty-text {
+  color: #94a3b8;
+  font-size: 13px;
+  font-style: italic;
+}
+
+.tabla-estudiantes {
+  margin: 0;
+}
+
+.tabla-estudiantes th {
+  background: #f1f5f9;
+  font-size: 11px;
+}
+
+.input-error {
+  border-color: #dc2626 !important;
+  box-shadow: 0 0 0 2px rgba(220, 38, 38, 0.15);
+}
+
+.error-msg {
+  display: block;
+  font-size: 12px;
+  color: #dc2626;
+  margin-top: 4px;
+}

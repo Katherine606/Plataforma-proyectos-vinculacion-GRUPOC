@@ -6,6 +6,13 @@
 <div *ngIf="error" class="alert-error">{{ error }}</div>
 <div *ngIf="mensajeExito" class="alert-success">{{ mensajeExito }}</div>
 
+<!-- BARRA DE BUSQUEDA -->
+<div class="search-bar" *ngIf="!cargando">
+  <input type="text" [(ngModel)]="buscarTexto" (input)="aplicarFiltro()"
+         placeholder="Buscar por nombre, tutor, facultad, carrera..." class="search-input">
+  <span class="search-count">{{ proyectos.length }} resultado(s)</span>
+</div>
+
 <div *ngIf="cargando" class="empty-state">Cargando proyectos...</div>
 
 <table *ngIf="!cargando && !error">
@@ -18,43 +25,120 @@
       <th>Cupos</th>
       <th *ngIf="isCoordinador" style="width:140px;">Acciones</th>
       <th *ngIf="isEstudiante" style="width:120px;">Acción</th>
+      <th style="width:80px;"></th>
     </tr>
   </thead>
   <tbody>
-    <tr *ngIf="proyectos.length === 0">
-      <td [attr.colspan]="isCoordinador ? 6 : (isEstudiante ? 6 : 5)" style="text-align:center; color:#94a3b8; padding:32px;">
-        No hay proyectos registrados.
+    <tr *ngIf="proyectosPaginados.length === 0">
+      <td [attr.colspan]="isCoordinador ? 7 : (isEstudiante ? 7 : 6)" style="text-align:center; color:#94a3b8; padding:32px;">
+        {{ buscarTexto ? 'No se encontraron proyectos con ese criterio.' : 'No hay proyectos registrados.' }}
       </td>
     </tr>
-    <tr *ngFor="let p of proyectos">
-      <td>
-        <strong>{{ p.nombre }}</strong>
-        <div *ngIf="p.descripcion" style="font-size:12px; color:#94a3b8; margin-top:2px; max-width:250px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
-          {{ p.descripcion }}
-        </div>
-      </td>
-      <td>{{ p.tutor }}</td>
-      <td>{{ p.facultad }}</td>
-      <td>{{ p.carrera }}</td>
-      <td>
-        <span class="cupos-badge" [class.cupos-lleno]="p.cupos_usados >= p.cupos_max">
-          {{ p.cupos_usados }}/{{ p.cupos_max }}
-        </span>
-      </td>
-      <td *ngIf="isCoordinador" class="acciones-cell">
-        <button class="btn-icon btn-edit" title="Editar" (click)="abrirEditor(p)">&#9998;</button>
-        <button class="btn-icon btn-delete" title="Eliminar" (click)="confirmarEliminar(p)">&#10005;</button>
-      </td>
-      <td *ngIf="isEstudiante">
-        <button class="btn btn-aceptar" *ngIf="p.cupos_usados < p.cupos_max"
-                style="padding:6px 14px; font-size:12px;" (click)="inscribirse(p)">
-          Inscribirse
-        </button>
-        <span *ngIf="p.cupos_usados >= p.cupos_max" style="font-size:12px; color:#94a3b8;">Lleno</span>
-      </td>
-    </tr>
+    <ng-container *ngFor="let p of proyectosPaginados">
+      <tr>
+        <td>
+          <strong>{{ p.nombre }}</strong>
+          <div *ngIf="p.descripcion" class="desc-preview">{{ p.descripcion }}</div>
+        </td>
+        <td>{{ p.tutor }}</td>
+        <td>{{ p.facultad }}</td>
+        <td>{{ p.carrera }}</td>
+        <td>
+          <span class="cupos-badge" [class.cupos-lleno]="p.cupos_usados >= p.cupos_max">
+            {{ p.cupos_usados }}/{{ p.cupos_max }}
+          </span>
+        </td>
+        <td *ngIf="isCoordinador" class="acciones-cell">
+          <button class="btn-icon btn-edit" title="Editar" (click)="abrirEditor(p)">&#9998;</button>
+          <button class="btn-icon btn-delete" title="Eliminar" (click)="confirmarEliminar(p)">&#10005;</button>
+        </td>
+        <td *ngIf="isEstudiante">
+          <button class="btn btn-aceptar" *ngIf="p.cupos_usados < p.cupos_max"
+                  style="padding:6px 14px; font-size:12px;" (click)="inscribirse(p)">
+            Inscribirse
+          </button>
+          <span *ngIf="p.cupos_usados >= p.cupos_max" style="font-size:12px; color:#94a3b8;">Lleno</span>
+        </td>
+        <td style="text-align:center;">
+          <button class="btn-icon btn-detalle" [class.btn-detalle-active]="proyectoDetalle?.proyecto?.id === p.id"
+                  title="Ver detalle" (click)="verDetalle(p)">
+            {{ proyectoDetalle?.proyecto?.id === p.id ? '&#10005;' : '&#8943;' }}
+          </button>
+        </td>
+      </tr>
+      <!-- DETALLE EXPANDIBLE -->
+      <tr *ngIf="proyectoDetalle?.proyecto?.id === p.id" class="detalle-row">
+        <td [attr.colspan]="isCoordinador ? 7 : (isEstudiante ? 7 : 6)" style="padding:0;">
+          <div class="detalle-panel">
+            <div class="detalle-loading" *ngIf="detalleCargando">Cargando detalle...</div>
+            <ng-container *ngIf="!detalleCargando && proyectoDetalle">
+              <div class="detalle-grid">
+                <div class="detalle-info">
+                  <h3>{{ proyectoDetalle.proyecto.nombre }}</h3>
+                  <p class="detalle-desc">{{ proyectoDetalle.proyecto.descripcion }}</p>
+                  <div class="detalle-meta">
+                    <div><strong>Tutor:</strong> {{ proyectoDetalle.proyecto.tutor }}</div>
+                    <div><strong>Facultad:</strong> {{ proyectoDetalle.proyecto.facultad }}</div>
+                    <div><strong>Carrera:</strong> {{ proyectoDetalle.proyecto.carrera }}</div>
+                    <div *ngIf="proyectoDetalle.proyecto.fecha_inicio">
+                      <strong>Inicio:</strong> {{ proyectoDetalle.proyecto.fecha_inicio }}
+                    </div>
+                    <div *ngIf="proyectoDetalle.proyecto.fecha_fin">
+                      <strong>Fin:</strong> {{ proyectoDetalle.proyecto.fecha_fin }}
+                    </div>
+                    <div>
+                      <strong>Cupos:</strong>
+                      {{ proyectoDetalle.proyecto.cupos_usados }} / {{ proyectoDetalle.proyecto.cupos_max }}
+                      <span *ngIf="proyectoDetalle.solicitudes_pendientes > 0" class="pendiente-badge">
+                        +{{ proyectoDetalle.solicitudes_pendientes }} pendiente(s)
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="detalle-estudiantes" *ngIf="proyectoDetalle.estudiantes.length > 0">
+                <h4>Estudiantes inscritos ({{ proyectoDetalle.estudiantes.length }})</h4>
+                <table class="tabla-estudiantes">
+                  <thead>
+                    <tr>
+                      <th>Nombre</th>
+                      <th>Correo</th>
+                      <th>Fecha inscripci&oacute;n</th>
+                      <th *ngIf="isCoordinador" style="width:80px;"></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let e of proyectoDetalle.estudiantes">
+                      <td>{{ e.estudiante }}</td>
+                      <td>{{ e.email }}</td>
+                      <td>{{ e.fecha_solicitud }}</td>
+                      <td *ngIf="isCoordinador" class="acciones-cell">
+                        <button class="btn-icon btn-delete" title="Remover del proyecto"
+                                (click)="sacarEstudiante(e.id_solicitud)">&#10005;</button>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <div class="detalle-estudiantes" *ngIf="proyectoDetalle.estudiantes.length === 0">
+                <h4>Estudiantes inscritos</h4>
+                <p style="color:#94a3b8; font-size:13px;">Ningun estudiante aceptado aun.</p>
+              </div>
+            </ng-container>
+          </div>
+        </td>
+      </tr>
+    </ng-container>
   </tbody>
 </table>
+
+<!-- PAGINACION -->
+<div class="paginacion" *ngIf="!cargando && totalPaginas > 1">
+  <button class="page-btn" [disabled]="paginaActual === 1" (click)="irPagina(paginaActual - 1)">&laquo;</button>
+  <button *ngFor="let p of paginasArray" class="page-btn" [class.page-active]="p === paginaActual"
+          (click)="irPagina(p)">{{ p }}</button>
+  <button class="page-btn" [disabled]="paginaActual === totalPaginas" (click)="irPagina(paginaActual + 1)">&raquo;</button>
+</div>
 
 <!-- MODAL DE EDICION -->
 <div *ngIf="modalAbierto && proyectoEditando" class="modal-overlay" (click)="cerrarModal()">
@@ -83,12 +167,14 @@
 
     <div class="form-group">
       <label>Nombre</label>
-      <input type="text" [(ngModel)]="editNombre">
+      <input type="text" [(ngModel)]="editNombre" [class.input-error]="erroresEdicion['nombre']">
+      <span class="error-msg" *ngIf="erroresEdicion['nombre']">{{ erroresEdicion['nombre'] }}</span>
     </div>
 
     <div class="form-group">
-      <label>Descripci&oacute;n</label>
-      <textarea [(ngModel)]="editDescripcion" rows="3"></textarea>
+      <label>Descripcion</label>
+      <textarea [(ngModel)]="editDescripcion" rows="3" [class.input-error]="erroresEdicion['descripcion']"></textarea>
+      <span class="error-msg" *ngIf="erroresEdicion['descripcion']">{{ erroresEdicion['descripcion'] }}</span>
     </div>
 
     <div class="form-group">
@@ -100,6 +186,17 @@
       <button type="button" class="btn-link" (click)="habilitarTutor()" *ngIf="editTutorBloqueado">
         Cambiar tutor
       </button>
+    </div>
+
+    <div class="form-row" style="display:flex; gap:12px;">
+      <div class="form-group" style="flex:1;">
+        <label>Fecha inicio</label>
+        <input type="date" [(ngModel)]="editFechaInicio">
+      </div>
+      <div class="form-group" style="flex:1;">
+        <label>Fecha fin</label>
+        <input type="date" [(ngModel)]="editFechaFin">
+      </div>
     </div>
 
     <div class="form-actions">

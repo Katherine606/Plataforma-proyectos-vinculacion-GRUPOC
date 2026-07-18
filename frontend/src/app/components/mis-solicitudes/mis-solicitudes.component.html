@@ -1,0 +1,65 @@
+<h1>Mis solicitudes</h1>
+
+<div *ngIf="errorMsg" class="alert-error">{{ errorMsg }}</div>
+<div *ngIf="cargando" class="empty-state">Cargando solicitudes...</div>
+
+<div *ngIf="!cargando && solicitudes.length === 0" class="empty-state">
+  No has enviado ninguna solicitud de inscripci&oacute;n a&uacute;n.
+  <br>
+  <a routerLink="/proyectos" style="color:#2563eb; font-size:13px;">Ver proyectos disponibles &rarr;</a>
+</div>
+
+<div *ngIf="!cargando && solicitudes.length > 0">
+
+  <!-- PENDIENTES -->
+  <div class="seccion" *ngIf="pendientes.length > 0">
+    <h2>
+      En espera
+      <span class="count pendiente">{{ pendientes.length }}</span>
+    </h2>
+    <div class="cards-list">
+      <div class="solicitud-card" *ngFor="let s of pendientes">
+        <div class="card-body">
+          <div class="card-proyecto">{{ s.nombre_proyecto }}</div>
+          <div class="card-fecha">{{ s.fecha_solicitud }}</div>
+        </div>
+        <span class="badge badge-pendiente">Pendiente</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ACEPTADAS -->
+  <div class="seccion" *ngIf="aceptadas.length > 0">
+    <h2>
+      Aceptadas
+      <span class="count aceptado">{{ aceptadas.length }}</span>
+    </h2>
+    <div class="cards-list">
+      <div class="solicitud-card card-aceptada" *ngFor="let s of aceptadas">
+        <div class="card-body">
+          <div class="card-proyecto">{{ s.nombre_proyecto }}</div>
+          <div class="card-fecha">{{ s.fecha_solicitud }}</div>
+        </div>
+        <span class="badge badge-aceptado">Aceptada</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- DENEGADAS -->
+  <div class="seccion" *ngIf="denegadas.length > 0">
+    <h2>
+      Denegadas
+      <span class="count denegado">{{ denegadas.length }}</span>
+    </h2>
+    <div class="cards-list">
+      <div class="solicitud-card card-denegada" *ngFor="let s of denegadas">
+        <div class="card-body">
+          <div class="card-proyecto">{{ s.nombre_proyecto }}</div>
+          <div class="card-fecha">{{ s.fecha_solicitud }}</div>
+        </div>
+        <span class="badge badge-denegado">Denegada</span>
+      </div>
+    </div>
+  </div>
+
+</div>

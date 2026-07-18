@@ -1,6 +1,3 @@
-// Modelo TypeScript que refleja la estructura del proyecto en el backend
-// Cuando llegue MySQL, esta interfaz se mantiene igual
-
 export interface Proyecto {
   id: number;
   nombre: string;
@@ -10,6 +7,9 @@ export interface Proyecto {
   carrera: string;
   cupos_max: number;
   cupos_usados: number;
+  estado?: string;
+  fecha_inicio?: string;
+  fecha_fin?: string;
 }
 
 export interface Solicitud {
@@ -18,4 +18,13 @@ export interface Solicitud {
   id_proyecto: number;
   nombre_proyecto: string;
   estado: 'pendiente' | 'aceptada' | 'denegada';
+  fecha_solicitud?: string;
+}
+
+export interface PaginacionResponse {
+  datos: any[];
+  total: number;
+  pagina: number;
+  por_pagina: number;
+  total_paginas: number;
 }

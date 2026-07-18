@@ -9,6 +9,7 @@ class ActividadDTO
     public string $nombreProyecto;
     public int $idTutor;
     public string $tutor;
+    public string $titulo;
     public string $fecha;
     public string $descripcion;
     public ?string $createdAt;
@@ -21,6 +22,7 @@ class ActividadDTO
         $dto->nombreProyecto  = $row['nombre_proyecto'] ?? $row['proyecto'] ?? '';
         $dto->idTutor         = (int) ($row['id_tutor'] ?? $row['tutor_id']);
         $dto->tutor           = $row['tutor'] ?? '';
+        $dto->titulo          = $row['titulo'] ?? '';
         $dto->fecha           = $row['fecha'];
         $dto->descripcion     = $row['descripcion'] ?? '';
         $dto->createdAt       = $row['created_at'] ?? null;
@@ -35,6 +37,7 @@ class ActividadDTO
             'nombre_proyecto' => $this->nombreProyecto,
             'id_tutor'        => $this->idTutor,
             'tutor'           => $this->tutor,
+            'titulo'          => $this->titulo,
             'fecha'           => $this->fecha,
             'descripcion'     => $this->descripcion,
             'created_at'      => $this->createdAt,

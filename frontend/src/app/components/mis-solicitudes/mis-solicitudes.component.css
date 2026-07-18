@@ -1,0 +1,103 @@
+.seccion {
+  margin-bottom: 28px;
+}
+
+.seccion h2 {
+  font-size: 15px;
+  color: #1e293b;
+  margin: 0 0 12px 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.count {
+  font-size: 12px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 10px;
+}
+
+.count.pendiente {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.count.aceptado {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.count.denegado {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.cards-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.solicitud-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 14px 18px;
+  transition: box-shadow 0.15s ease;
+}
+
+.solicitud-card:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.card-aceptada {
+  border-left: 3px solid #10b981;
+}
+
+.card-denegada {
+  border-left: 3px solid #ef4444;
+}
+
+.card-body {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.card-proyecto {
+  font-weight: 600;
+  color: #1e293b;
+  font-size: 14px;
+}
+
+.card-fecha {
+  font-size: 12px;
+  color: #94a3b8;
+}
+
+.badge {
+  font-size: 12px;
+  font-weight: 600;
+  padding: 4px 12px;
+  border-radius: 6px;
+  white-space: nowrap;
+}
+
+.badge-pendiente {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.badge-aceptado {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.badge-denegado {
+  background: #fee2e2;
+  color: #991b1b;
+}

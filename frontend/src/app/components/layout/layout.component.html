@@ -27,6 +27,9 @@
       <a *ngIf="canManageStudents || canManageProjects" routerLink="/solicitudes" routerLinkActive="active">
         Solicitudes
       </a>
+      <a *ngIf="isEstudiante" routerLink="/mis-solicitudes" routerLinkActive="active">
+        Mis solicitudes
+      </a>
       <a *ngIf="isEstudiante" routerLink="/registro-horas" routerLinkActive="active">
         Registrar horas
       </a>
@@ -35,6 +38,12 @@
       </a>
       <a *ngIf="canManageStudents" routerLink="/aprobacion-horas" routerLinkActive="active">
         Aprobar horas
+      </a>
+      <a *ngIf="canManageProjects" routerLink="/usuarios" routerLinkActive="active">
+        Usuarios
+      </a>
+      <a routerLink="/perfil" routerLinkActive="active">
+        Mi perfil
       </a>
     </nav>
 

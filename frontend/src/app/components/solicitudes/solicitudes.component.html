@@ -13,6 +13,11 @@
 
 <div *ngIf="cargando" style="color:#94a3b8;">Cargando solicitudes...</div>
 
+<div class="search-bar" *ngIf="!cargando">
+  <input type="text" [(ngModel)]="buscarTexto" (input)="aplicarFiltro()"
+         placeholder="Buscar por estudiante, proyecto o estado..." class="search-input">
+</div>
+
 <div *ngIf="!cargando">
 
   <!-- PENDIENTES -->

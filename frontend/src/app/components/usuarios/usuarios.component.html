@@ -1,0 +1,92 @@
+<div class="crud-header">
+  <h1>Usuarios</h1>
+  <button class="btn" (click)="abrirCrear()">+ Nuevo Usuario</button>
+</div>
+
+<div *ngIf="error" class="alert-error">{{ error }}</div>
+<div *ngIf="exito" class="alert-success">{{ exito }}</div>
+
+<div *ngIf="cargando" class="empty-state">Cargando usuarios...</div>
+
+<table *ngIf="!cargando">
+  <thead>
+    <tr>
+      <th>Nombre</th>
+      <th>Correo</th>
+      <th>Rol</th>
+      <th>Estado</th>
+      <th style="width:140px;">Acciones</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngIf="usuarios.length === 0">
+      <td colspan="5" style="text-align:center; color:#94a3b8; padding:32px;">No hay usuarios registrados.</td>
+    </tr>
+    <tr *ngFor="let u of usuarios">
+      <td>
+        <strong>{{ u.nombre }} {{ u.apellido }}</strong>
+      </td>
+      <td>{{ u.correo }}</td>
+      <td>
+        <span class="rol-badge" [attr.data-rol]="u.rol">{{ u.rol }}</span>
+      </td>
+      <td>
+        <span class="estado-badge" [class.estado-inactivo]="u.estado === 'inactivo'">
+          {{ u.estado === 'activo' ? 'Activo' : 'Inactivo' }}
+        </span>
+      </td>
+      <td class="acciones-cell">
+        <button class="btn-icon btn-edit" title="Editar" (click)="abrirEditar(u)">&#9998;</button>
+        <button class="btn-icon" [class.btn-toggle]="u.estado === 'activo'" [class.btn-toggle-off]="u.estado !== 'activo'"
+                [title]="u.estado === 'activo' ? 'Desactivar' : 'Activar'" (click)="toggleEstado(u)">
+          {{ u.estado === 'activo' ? '&#10003;' : '&#10007;' }}
+        </button>
+        <button class="btn-icon btn-delete" title="Eliminar" (click)="eliminar(u)">&#10005;</button>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<!-- MODAL CREAR / EDITAR -->
+<div *ngIf="modalAbierto" class="modal-overlay" (click)="cerrarModal()">
+  <div class="modal-box" (click)="$event.stopPropagation()">
+    <button class="modal-cerrar-x" (click)="cerrarModal()">&#10005;</button>
+    <h2>{{ editando ? 'Editar Usuario' : 'Nuevo Usuario' }}</h2>
+
+    <div class="form-group">
+      <label>Nombre</label>
+      <input type="text" [(ngModel)]="form.nombre" placeholder="Nombre" [class.input-error]="erroresForm['nombre']">
+      <span class="error-msg" *ngIf="erroresForm['nombre']">{{ erroresForm['nombre'] }}</span>
+    </div>
+
+    <div class="form-group">
+      <label>Apellido</label>
+      <input type="text" [(ngModel)]="form.apellido" placeholder="Apellido" [class.input-error]="erroresForm['apellido']">
+      <span class="error-msg" *ngIf="erroresForm['apellido']">{{ erroresForm['apellido'] }}</span>
+    </div>
+
+    <div class="form-group">
+      <label>Correo</label>
+      <input type="email" [(ngModel)]="form.correo" placeholder="correo@ug.edu.ec" [class.input-error]="erroresForm['correo']">
+      <span class="error-msg" *ngIf="erroresForm['correo']">{{ erroresForm['correo'] }}</span>
+    </div>
+
+    <div class="form-group">
+      <label>{{ editando ? 'Nueva contrasena (dejar vacio para no cambiar)' : 'Contrasena' }}</label>
+      <input type="password" [(ngModel)]="form.password" placeholder="Minimo 6 caracteres" [class.input-error]="erroresForm['password']">
+      <span class="error-msg" *ngIf="erroresForm['password']">{{ erroresForm['password'] }}</span>
+    </div>
+
+    <div class="form-group">
+      <label>Rol</label>
+      <select [(ngModel)]="form.rol_id">
+        <option *ngFor="let r of roles" [ngValue]="r.id">{{ r.nombre }}</option>
+      </select>
+    </div>
+
+    <div class="form-actions">
+      <button class="btn" (click)="guardar()">{{ editando ? 'Actualizar' : 'Crear' }}</button>
+      <button class="btn btn-secondary" (click)="cerrarModal()">Cancelar</button>
+    </div>
+  </div>
+</div>

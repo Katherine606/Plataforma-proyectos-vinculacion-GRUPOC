@@ -1,112 +1,205 @@
-<h1>Dashboard</h1>
-
-<p *ngIf="cargando" style="color:#94a3b8;">Cargando datos...</p>
-
-<div *ngIf="errorMsg" class="alert-error">
-  {{ errorMsg }}
+<div class="dashboard-welcome">
+  <h1>{{ saludo }}, {{ nombre }}</h1>
+  <p class="welcome-sub">Resumen de tu actividad en la plataforma</p>
 </div>
 
-<!-- ═══ DASHBOARD DEL COORDINADOR ═══ -->
-<div *ngIf="!cargando && rol.includes('coordinador') && datos" class="stats-row">
-  <div class="stat-card">
-    <span class="stat-icon">📁</span>
-    <div>
-      <small>Proyectos Activos</small>
-      <strong>{{ datos.total_proyectos }}</strong>
+<p *ngIf="cargando" class="empty-state">Cargando datos...</p>
+
+<div *ngIf="errorMsg" class="alert-error">{{ errorMsg }}</div>
+
+<!-- ═══ COORDINADOR ═══ -->
+<div *ngIf="!cargando && rol.includes('coordinador') && datos" class="dashboard-grid">
+
+  <a routerLink="/proyectos" class="dash-card link-card">
+    <div class="dash-icon" style="background:#ede9fe; color:#7c3aed;">&#128194;</div>
+    <div class="dash-info">
+      <small>Proyectos activos</small>
+      <strong class="dash-num">{{ datos.total_proyectos }}</strong>
+    </div>
+  </a>
+
+  <a routerLink="/usuarios" class="dash-card link-card">
+    <div class="dash-icon" style="background:#dbeafe; color:#2563eb;">&#128101;</div>
+    <div class="dash-info">
+      <small>Estudiantes activos</small>
+      <strong class="dash-num">{{ datos.total_estudiantes }}</strong>
+    </div>
+  </a>
+
+  <a routerLink="/solicitudes" class="dash-card link-card">
+    <div class="dash-icon" style="background:#fef3c7; color:#d97706;">&#128232;</div>
+    <div class="dash-info">
+      <small>Solicitudes pendientes</small>
+      <strong class="dash-num">{{ datos.solicitudes_pendientes }}</strong>
+    </div>
+  </a>
+
+  <div class="dash-card">
+    <div class="dash-icon" style="background:#d1fae5; color:#059669;">&#10003;</div>
+    <div class="dash-info">
+      <small>Solicitudes aceptadas</small>
+      <strong class="dash-num">{{ datos.solicitudes_aceptadas }}</strong>
     </div>
   </div>
-  <div class="stat-card">
-    <span class="stat-icon">👥</span>
-    <div>
-      <small>Total Estudiantes</small>
-      <strong>{{ datos.total_estudiantes }}</strong>
+
+  <div class="dash-card dash-card-wide">
+    <div class="dash-icon" style="background:#fce7f3; color:#db2777;">&#9201;</div>
+    <div class="dash-info" style="flex:1;">
+      <small>Horas aprobadas (total)</small>
+      <strong class="dash-num">{{ datos.total_horas_aprobadas }}h</strong>
     </div>
   </div>
-  <div class="stat-card">
-    <span class="stat-icon">📨</span>
-    <div>
-      <small>Solicitudes Pendientes</small>
-      <strong>{{ datos.solicitudes_pendientes }}</strong>
+
+  <!-- GRAFICO BARRAS SOLICITUDES -->
+  <div class="dash-card dash-card-wide chart-card">
+    <div class="chart-title">Solicitudes</div>
+    <div class="chart-bars">
+      <div class="chart-row">
+        <span class="chart-label">Pendientes</span>
+        <div class="chart-bar-track">
+          <div class="chart-bar chart-bar-amber" [style.width.%]="solicitudesPendientesPct"></div>
+        </div>
+        <span class="chart-val">{{ datos.solicitudes_pendientes }}</span>
+      </div>
+      <div class="chart-row">
+        <span class="chart-label">Aceptadas</span>
+        <div class="chart-bar-track">
+          <div class="chart-bar chart-bar-green" [style.width.%]="solicitudesAceptadasPct"></div>
+        </div>
+        <span class="chart-val">{{ datos.solicitudes_aceptadas }}</span>
+      </div>
     </div>
   </div>
-  <div class="stat-card">
-    <span class="stat-icon">✅</span>
-    <div>
-      <small>Solicitudes Aceptadas</small>
-      <strong>{{ datos.solicitudes_aceptadas }}</strong>
-    </div>
-  </div>
-  <div class="stat-card">
-    <span class="stat-icon">⏱️</span>
-    <div>
-      <small>Horas Aprobadas</small>
-      <strong>{{ datos.total_horas_aprobadas }}</strong>
-    </div>
-  </div>
+
 </div>
 
-<!-- ═══ DASHBOARD DEL TUTOR ═══ -->
-<div *ngIf="!cargando && rol.includes('tutor') && datos" class="stats-row">
-  <div class="stat-card">
-    <span class="stat-icon">📁</span>
-    <div>
-      <small>Proyectos Asignados</small>
-      <strong>{{ datos.proyectos_asignados }}</strong>
+<!-- ═══ TUTOR ═══ -->
+<div *ngIf="!cargando && rol.includes('tutor') && datos" class="dashboard-grid">
+
+  <a routerLink="/proyectos" class="dash-card link-card">
+    <div class="dash-icon" style="background:#ede9fe; color:#7c3aed;">&#128194;</div>
+    <div class="dash-info">
+      <small>Proyectos asignados</small>
+      <strong class="dash-num">{{ datos.proyectos_asignados }}</strong>
     </div>
-  </div>
-  <div class="stat-card">
-    <span class="stat-icon">👥</span>
-    <div>
+  </a>
+
+  <div class="dash-card">
+    <div class="dash-icon" style="background:#dbeafe; color:#2563eb;">&#128101;</div>
+    <div class="dash-info">
       <small>Estudiantes a cargo</small>
-      <strong>{{ datos.estudiantes_asignados }}</strong>
+      <strong class="dash-num">{{ datos.estudiantes_asignados }}</strong>
     </div>
   </div>
-  <div class="stat-card">
-    <span class="stat-icon">⏳</span>
-    <div>
-      <small>Horas Pendientes</small>
-      <strong>{{ datos.horas_pendientes }}</strong>
+
+  <a routerLink="/aprobacion-horas" class="dash-card link-card" *ngIf="datos.horas_pendientes > 0">
+    <div class="dash-icon" style="background:#fef3c7; color:#d97706;">&#9203;</div>
+    <div class="dash-info">
+      <small>Horas pendientes</small>
+      <strong class="dash-num">{{ datos.horas_pendientes }}</strong>
+    </div>
+  </a>
+
+  <div class="dash-card" *ngIf="datos.horas_pendientes === 0">
+    <div class="dash-icon" style="background:#d1fae5; color:#059669;">&#10003;</div>
+    <div class="dash-info">
+      <small>Horas pendientes</small>
+      <strong class="dash-num">0</strong>
     </div>
   </div>
-  <div class="stat-card">
-    <span class="stat-icon">✅</span>
-    <div>
-      <small>Horas Aprobadas</small>
-      <strong>{{ datos.horas_aprobadas }}</strong>
+
+  <div class="dash-card dash-card-wide">
+    <div class="dash-icon" style="background:#d1fae5; color:#059669;">&#10003;</div>
+    <div class="dash-info" style="flex:1;">
+      <small>Horas aprobadas</small>
+      <strong class="dash-num">{{ datos.horas_aprobadas }}</strong>
+      <div class="progress-bar" *ngIf="porcentajeHoras > 0">
+        <div class="progress-fill" [style.width.%]="porcentajeHoras"></div>
+      </div>
+      <small class="progress-label" *ngIf="porcentajeHoras > 0">{{ porcentajeHoras }}% aprobadas</small>
     </div>
   </div>
+
+  <!-- GRAFICO BARRAS TUTOR -->
+  <div class="dash-card dash-card-wide chart-card">
+    <div class="chart-title">Horas por estado</div>
+    <div class="chart-bars">
+      <div class="chart-row">
+        <span class="chart-label">Aprobadas</span>
+        <div class="chart-bar-track">
+          <div class="chart-bar chart-bar-green" [style.width.%]="tutorAprobadasPct"></div>
+        </div>
+        <span class="chart-val">{{ datos.horas_aprobadas }}</span>
+      </div>
+      <div class="chart-row">
+        <span class="chart-label">Pendientes</span>
+        <div class="chart-bar-track">
+          <div class="chart-bar chart-bar-amber" [style.width.%]="tutorPendientesPct"></div>
+        </div>
+        <span class="chart-val">{{ datos.horas_pendientes }}</span>
+      </div>
+    </div>
+  </div>
+
 </div>
 
-<!-- ═══ DASHBOARD DEL ESTUDIANTE ═══ -->
-<div *ngIf="!cargando && rol.includes('estudiante') && datos" class="stats-row">
-  <div class="stat-card">
-    <span class="stat-icon">✅</span>
-    <div>
-      <small>Horas Aprobadas</small>
-      <strong>{{ datos.horas_aprobadas }}</strong>
+<!-- ═══ ESTUDIANTE ═══ -->
+<div *ngIf="!cargando && rol.includes('estudiante') && datos" class="dashboard-grid">
+
+  <a routerLink="/mis-solicitudes" class="dash-card link-card">
+    <div class="dash-icon" style="background:#d1fae5; color:#059669;">&#10003;</div>
+    <div class="dash-info">
+      <small>Solicitudes aceptadas</small>
+      <strong class="dash-num">{{ datos.solicitudes_aceptadas }}</strong>
+    </div>
+  </a>
+
+  <div class="dash-card">
+    <div class="dash-icon" style="background:#fef3c7; color:#d97706;">&#128232;</div>
+    <div class="dash-info">
+      <small>Total solicitudes</small>
+      <strong class="dash-num">{{ datos.total_solicitudes }}</strong>
     </div>
   </div>
-  <div class="stat-card">
-    <span class="stat-icon">⏳</span>
-    <div>
-      <small>Horas Pendientes</small>
-      <strong>{{ datos.horas_pendientes }}</strong>
+
+  <a routerLink="/mis-horas" class="dash-card link-card">
+    <div class="dash-icon" style="background:#dbeafe; color:#2563eb;">&#9201;</div>
+    <div class="dash-info">
+      <small>Horas aprobadas</small>
+      <strong class="dash-num">{{ datos.horas_aprobadas }}</strong>
+    </div>
+  </a>
+
+  <div class="dash-card">
+    <div class="dash-icon" style="background:#fce7f3; color:#db2777;">&#9203;</div>
+    <div class="dash-info">
+      <small>Horas pendientes</small>
+      <strong class="dash-num">{{ datos.horas_pendientes }}</strong>
     </div>
   </div>
-  <div class="stat-card">
-    <span class="stat-icon">📨</span>
-    <div>
-      <small>Total Solicitudes</small>
-      <strong>{{ datos.total_solicitudes }}</strong>
+
+  <!-- GRAFICO ESTUDIANTE -->
+  <div class="dash-card dash-card-wide chart-card">
+    <div class="chart-title">Progreso de horas</div>
+    <div class="chart-bars">
+      <div class="chart-row">
+        <span class="chart-label">Aprobadas</span>
+        <div class="chart-bar-track">
+          <div class="chart-bar chart-bar-green" [style.width.%]="porcentajeHoras"></div>
+        </div>
+        <span class="chart-val">{{ datos.horas_aprobadas }}h</span>
+      </div>
+      <div class="chart-row">
+        <span class="chart-label">Pendientes</span>
+        <div class="chart-bar-track">
+          <div class="chart-bar chart-bar-amber" [style.width.%]="estudiantePendientesPct"></div>
+        </div>
+        <span class="chart-val">{{ datos.horas_pendientes }}h</span>
+      </div>
     </div>
+    <small class="progress-label" style="margin-top:8px;">{{ porcentajeHoras }}% completado</small>
   </div>
-  <div class="stat-card">
-    <span class="stat-icon">🎉</span>
-    <div>
-      <small>Solicitudes Aceptadas</small>
-      <strong>{{ datos.solicitudes_aceptadas }}</strong>
-    </div>
-  </div>
+
 </div>
 
 <p *ngIf="!cargando && !datos" class="empty-state">No hay datos disponibles.</p>

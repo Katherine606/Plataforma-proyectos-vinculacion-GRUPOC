@@ -71,3 +71,204 @@
 .btn-link:hover {
   text-decoration: underline;
 }
+
+/* ─── DETAIL BUTTON ──────────────────────────────────────────────────────── */
+
+.btn-detalle {
+  color: #64748b;
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 2px;
+}
+
+.btn-detalle:hover {
+  background: #f1f5f9;
+  border-color: #cbd5e1;
+}
+
+.btn-detalle-active {
+  color: #dc2626;
+  background: #fef2f2;
+  border-color: #fca5a5;
+}
+
+/* ─── DETAIL PANEL ───────────────────────────────────────────────────────── */
+
+.detalle-row td {
+  background: #f8fafc;
+  border-top: none;
+}
+
+.detalle-panel {
+  padding: 20px 24px;
+  border-top: 2px solid #e2e8f0;
+}
+
+.detalle-loading {
+  text-align: center;
+  color: #94a3b8;
+  padding: 20px;
+}
+
+.detalle-grid {
+  display: flex;
+  gap: 32px;
+  margin-bottom: 20px;
+}
+
+.detalle-info h3 {
+  margin: 0 0 6px 0;
+  font-size: 16px;
+  color: #1e293b;
+}
+
+.detalle-desc {
+  font-size: 13px;
+  color: #64748b;
+  line-height: 1.5;
+  margin: 0 0 12px 0;
+  max-width: 600px;
+}
+
+.detalle-meta {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 8px;
+  font-size: 13px;
+  color: #475569;
+}
+
+.detalle-meta strong {
+  color: #1e293b;
+}
+
+.pendiente-badge {
+  display: inline-block;
+  background: #fef3c7;
+  color: #92400e;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 6px;
+  border-radius: 4px;
+  margin-left: 6px;
+}
+
+/* ─── ESTUDIANTES TABLE ──────────────────────────────────────────────────── */
+
+.detalle-estudiantes h4 {
+  margin: 16px 0 8px 0;
+  font-size: 14px;
+  color: #1e293b;
+  border-bottom: 1px solid #e2e8f0;
+  padding-bottom: 6px;
+}
+
+.tabla-estudiantes {
+  width: 100%;
+  font-size: 13px;
+}
+
+.tabla-estudiantes th {
+  background: #f1f5f9;
+  padding: 8px 12px;
+  text-align: left;
+  font-weight: 600;
+  color: #475569;
+  font-size: 12px;
+}
+
+.tabla-estudiantes td {
+  padding: 10px 12px;
+  border-bottom: 1px solid #f1f5f9;
+  color: #334155;
+}
+
+.tabla-estudiantes tr:hover td {
+  background: #f8fafc;
+}
+
+.desc-preview {
+  font-size: 12px;
+  color: #94a3b8;
+  margin-top: 2px;
+  max-width: 250px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ─── SEARCH BAR ──────────────────────────────────────────────────────── */
+
+.search-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.search-input {
+  flex: 1;
+  padding: 10px 14px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 13px;
+  outline: none;
+  transition: border-color 0.15s ease;
+  font-family: inherit;
+}
+
+.search-input:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.search-count {
+  font-size: 12px;
+  color: #94a3b8;
+  white-space: nowrap;
+}
+
+/* ─── PAGINATION ──────────────────────────────────────────────────────── */
+
+.paginacion {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 4px;
+  margin-top: 20px;
+  padding: 12px 0;
+}
+
+.page-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 32px;
+  height: 32px;
+  padding: 0 8px;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  background: white;
+  color: #475569;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  font-family: inherit;
+}
+
+.page-btn:hover:not(:disabled):not(.page-active) {
+  background: #f1f5f9;
+  border-color: #cbd5e1;
+}
+
+.page-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.page-active {
+  background: #2563eb;
+  color: white;
+  border-color: #2563eb;
+  font-weight: 600;
+}

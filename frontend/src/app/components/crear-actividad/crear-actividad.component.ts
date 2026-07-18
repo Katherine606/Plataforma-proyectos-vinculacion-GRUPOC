@@ -2,8 +2,7 @@ import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { HttpErrorResponse, HttpClient } from '@angular/common/http';
-import { ActividadService } from '../../services/actividad.service';
-import { Actividad } from '../../models/actividad.model';
+import { ActividadService, ActividadDetalle, EstudianteActividad } from '../../services/actividad.service';
 import { Proyecto } from '../../models/proyecto.model';
 
 @Component({
@@ -17,10 +16,14 @@ export class CrearActividadComponent implements OnInit {
 
   form: FormGroup;
   proyectos: Proyecto[] = [];
-  actividades: Actividad[] = [];
+  actividades: ActividadDetalle[] = [];
   enviando = false;
   exitoMsg = '';
   errorMsg = '';
+
+  actividadExpandida: number | null = null;
+  estudiantesCargando = false;
+  estudiantesMap: { [key: number]: EstudianteActividad[] } = {};
 
   constructor(
     private fb: FormBuilder,
@@ -30,24 +33,49 @@ export class CrearActividadComponent implements OnInit {
   ) {
     this.form = this.fb.group({
       proyecto_id:  [null, [Validators.required]],
+      titulo:       ['', [Validators.required, Validators.minLength(3), Validators.maxLength(200)]],
       fecha:        ['', [Validators.required]],
       descripcion:  ['', [Validators.required, Validators.minLength(5)]],
     });
   }
 
   ngOnInit(): void {
-    this.http.get<Proyecto[]>('http://localhost:8000/index.php?recurso=proyectos').subscribe({
+    this.http.get<Proyecto[]>('http://localhost:8000/index.php?recurso=proyectos&accion=tutor').subscribe({
       next: (data) => { this.proyectos = data; this.cdr.detectChanges(); },
-      error: () => { console.error('Error al cargar proyectos'); }
+      error: () => console.error('Error al cargar proyectos del tutor')
     });
     this.cargarActividades();
   }
 
   cargarActividades(): void {
-    this.actividadService.getActividades().subscribe({
+    this.actividadService.getDetalleTutor().subscribe({
       next: (data) => { this.actividades = data; this.cdr.detectChanges(); },
-      error: (err) => { console.error(err); }
+      error: (err) => { console.error(err); this.actividades = []; this.cdr.detectChanges(); }
     });
+  }
+
+  toggleEstudiantes(actividad: ActividadDetalle): void {
+    if (this.actividadExpandida === actividad.id) {
+      this.actividadExpandida = null;
+      return;
+    }
+    this.actividadExpandida = actividad.id;
+
+    if (!this.estudiantesMap[actividad.id]) {
+      this.estudiantesCargando = true;
+      this.actividadService.getEstudiantesEnActividad(actividad.id).subscribe({
+        next: (data) => {
+          this.estudiantesMap[actividad.id] = data;
+          this.estudiantesCargando = false;
+          this.cdr.detectChanges();
+        },
+        error: () => {
+          this.estudiantesMap[actividad.id] = [];
+          this.estudiantesCargando = false;
+          this.cdr.detectChanges();
+        }
+      });
+    }
   }
 
   onSubmit(): void {
@@ -78,7 +106,7 @@ export class CrearActividadComponent implements OnInit {
   eliminar(id: number): void {
     if (!confirm('¿Eliminar esta actividad?')) return;
     this.actividadService.eliminarActividad(id).subscribe({
-      next: () => { this.cargarActividades(); },
+      next: () => this.cargarActividades(),
       error: (err) => { this.errorMsg = err.error?.error || 'No se pudo eliminar.'; this.cdr.detectChanges(); }
     });
   }

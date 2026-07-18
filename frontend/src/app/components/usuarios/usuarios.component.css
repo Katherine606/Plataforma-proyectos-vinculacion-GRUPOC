@@ -1,0 +1,94 @@
+.acciones-cell {
+  white-space: nowrap;
+}
+
+.btn-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  background: white;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.15s ease;
+}
+
+.btn-edit {
+  color: #2563eb;
+}
+
+.btn-edit:hover {
+  background: #eff6ff;
+  border-color: #2563eb;
+}
+
+.btn-delete {
+  color: #dc2626;
+  margin-left: 4px;
+}
+
+.btn-delete:hover {
+  background: #fef2f2;
+  border-color: #dc2626;
+}
+
+.btn-toggle {
+  color: #16a34a;
+  margin-left: 4px;
+}
+
+.btn-toggle:hover {
+  background: #f0fdf4;
+  border-color: #16a34a;
+}
+
+.btn-toggle-off {
+  color: #94a3b8;
+  margin-left: 4px;
+}
+
+.btn-toggle-off:hover {
+  background: #f1f5f9;
+  border-color: #94a3b8;
+}
+
+.rol-badge {
+  font-size: 12px;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 6px;
+  background: #f1f5f9;
+  color: #475569;
+}
+
+.rol-badge[data-rol*="Coordinador"] {
+  background: #ede9fe;
+  color: #6d28d9;
+}
+
+.rol-badge[data-rol*="Tutor"] {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+.rol-badge[data-rol*="Estudiante"] {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.estado-badge {
+  font-size: 12px;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 6px;
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.estado-inactivo {
+  background: #fee2e2;
+  color: #991b1b;
+}
