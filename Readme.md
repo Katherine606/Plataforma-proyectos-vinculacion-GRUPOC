@@ -1,6 +1,6 @@
 # Plataforma de Gestión de Proyectos de Vinculación
 
-## 1. Descripción General
+## 1. DESCRIPCIÓN GENERAL
 
 La presente guía tiene como objetivo detallar el procedimiento necesario para descargar, configurar y ejecutar el proyecto **“Plataforma de Gestión de Proyectos de Vinculación”**.
 
@@ -10,7 +10,7 @@ El sistema fue desarrollado utilizando una arquitectura **MVC (Modelo Vista Cont
 - PHP para el backend
 - MySQL como gestor de base de datos
 
-# 2. REQUISITOS PREVIOS
+## 2. REQUISITOS PREVIOS
 
 Antes de ejecutar el sistema es necesario instalar las siguientes herramientas:
 
@@ -27,7 +27,7 @@ Verificar las instalaciones abriendo una terminal y ejecutando:
   npm --version
 
 
-# 3. DESCARGAR EL PROYECTO DESDE GITHUB
+## 3. DESCARGAR EL PROYECTO DESDE GITHUB
 
 Abrir CMD o PowerShell y ejecutar:
 
@@ -41,7 +41,7 @@ Ingresar a la carpeta del proyecto:
 ```bash
 cd Plataforma-proyectos-vinculacion-GRUPOC
 ```
-# 4. ABRIR EL PROYECTO EN VISUAL STUDIO CODE
+## 4. ABRIR EL PROYECTO EN VISUAL STUDIO CODE
 
   - Abrir Visual Studio Code.
   - Buscar y abrir la carpeta: Plataforma-proyectos-vinculacion-GRUPOC
@@ -50,7 +50,7 @@ cd Plataforma-proyectos-vinculacion-GRUPOC
     Terminal > New Terminal
   - La terminal aparecera en la parte inferior del IDE.
 
-# 5. CONFIGURACION INICIAL DE POWERSHELL (Solo la Primera Vez)
+## 5. CONFIGURACION INICIAL DE POWERSHELL (Solo la Primera Vez)
 
 En algunos equipos Windows, PowerShell bloquea la ejecución de scripts de Node.js.
 
@@ -68,7 +68,7 @@ y presionar Enter.
 
 Cerrar y volver a abrir Visual Studio Code.
 
-# 6. Instalación y Ejecución del Frontend
+## 6. Instalación y Ejecución del Frontend
 
 En la terminal ejecutar:
 ```bash
@@ -97,15 +97,15 @@ ng serve
 
 Abrir en el navegador: http://localhost:4200
 
-# 6. CONFIGURACION DE LA BASE DE DATOS (OBLIGATORIO)
+## 6. CONFIGURACION DE LA BASE DE DATOS (OBLIGATORIO)
 
-6.1 Iniciar Apache y MySQL en XAMPP
+### 6.1 Iniciar Apache y MySQL en XAMPP
 
   - Abrir el Panel de Control de XAMPP.
   - Iniciar el servicio Apache.
   - Iniciar el servicio MySQL.
 
-6.2 Crear la base de datos
+### 6.2 Crear la base de datos
 
   Abrir phpMyAdmin en el navegador: http://localhost/phpmyadmin
 
@@ -128,7 +128,7 @@ Abrir en el navegador: http://localhost:4200
   Paso 3: Ejecutar las migraciones en orden
     Importar la base: "vinculacion_db"
 
-6.3 Credenciales de base de datos
+### 6.3 Credenciales de base de datos
 
   El backend se conecta automaticamente con estos parametros (config/database.php):
     Servidor:  localhost
@@ -141,7 +141,7 @@ Abrir en el navegador: http://localhost:4200
   contrasena de root, edita el archivo backend/config/database.php.
 
 
-# 7. EJECUTAR EL BACKEND
+## 7. EJECUTAR EL BACKEND
 
 Abrir una nueva terminal dentro de Visual Studio Code.
 
@@ -163,7 +163,7 @@ C:\xampp\php\php.exe -S localhost:8000
 
 Si la ejecución es correcta aparecerá: PHP Development Server started
 
-# 8. VERIFICACION DEL BACKEND
+## 8. VERIFICACION DEL BACKEND
 
 Abrir en el navegador:
 
@@ -171,41 +171,11 @@ http://localhost:8000/index.php?recurso=proyectos
 
 Si el backend funciona correctamente se mostrará información JSON correspondiente a los proyectos registrados.
 
-# 9. CREDENCIALES DE PRUEBA
+## 9. CREDENCIALES DE PRUEBA
 
   Usuario:               Contrasena:    Rol:
   coordinador@ug.edu.ec  Coord123*      Coordinador
   tutor@ug.edu.ec        Tutor123*      Tutor Academico
   estudiante@ug.edu.ec   Est12345*      Estudiante
-
- # 10. ESTRUCTURA DEL PROYECTO
-
-  Plataforma-proyectos-vinculacion-GRUPOC/
-  |
-  |-- base/
-  |   |-- vinculacion_db            (Dump SQL completo con datos de prueba)
-  |
-  |-- database/
-  |   |-- schema.sql                (Esquema principal de tablas)
-  |   |-- migrate_tablas_faltantes.sql  (Migracion: actividades + horas)
-  |   |-- fix_enum_estados.sql      (Correccion de ENUMs)
-  |   |-- add_titulo_actividad.sql  (Columna titulo en actividades)
-  |
-  |-- frontend/                     (Angular 21 - SPA)
-  |   |-- src/app/
-  |       |-- components/           (13 componentes standalone)
-  |       |-- services/             (4 servicios HTTP)
-  |       |-- guards/               (AuthGuard + RoleGuard)
-  |       |-- interceptors/         (JWT interceptor)
-  |       |-- models/               (Interfaces TypeScript)
-  |
-  |-- backend/                      (PHP 8.0 - API REST)
-  |   |-- index.php                 (Router principal)
-  |   |-- config/                   (database.php + JwtHelper.php)
-  |   |-- controllers/              (9 controladores)
-  |   |-- models/dao/               (6 DAOs)
-  |   |-- models/dto/               (5 DTOs)
-  |
-  |-- docs/                         (Documentacion del proyecto)
 
 
